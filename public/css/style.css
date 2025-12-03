@@ -1,0 +1,1680 @@
+ html, body {
+    height: 100%;
+    padding: 0;
+    margin: 0;
+    font-family: 'Poppins', sans-serif;
+    line-height: 1.6;
+    /* background: #000000; Light background for contrast */
+     background: linear-gradient(
+       to right,
+       rgba(3, 18, 115, 0.342),  
+       rgba(3, 18, 115, 0.342)   ) !important;
+    color: #000000;
+  }
+
+  main{
+    padding: 0;
+  }
+
+  h2 {
+    text-align: center;
+    color: #fff;
+    background: linear-gradient(to right, #031273, #2196F3);
+    padding: 12px 0;
+    border-radius: 50px;
+    border: none;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    font-weight: 600;
+    letter-spacing: 1px;
+    width: 400px;
+    max-width: 90vw;
+    margin: 0 auto 25px;
+  }
+
+  hr{
+    border: none;
+    height: 6px;
+    background: linear-gradient(to right, #031273, #2196F3);
+    width: 100%;
+    margin: 0rem auto;  /* ✅ Auto centers it horizontally */
+    border-radius: 2px; /* Optional: slightly rounded edges */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); /* Optional: subtle shadow */
+  }
+
+  /* Default view (desktop) */
+  .desktop-text {
+    display: block;
+  }
+  .mobile-text {
+    display: none;
+  }
+
+  /* Mobile-specific adjustments */
+  @media (max-width: 768px) {
+    .desktop-text {
+      display: none;
+    }
+
+    .mobile-text {
+      display: block;
+    }
+
+    .showcase {
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      flex-wrap: nowrap;
+      padding: 20px;
+      max-width: 100%;
+      overflow-x: hidden;
+      box-sizing: border-box;
+      gap: 10px;
+    }
+
+    .logo img {
+      height: 700px;
+      width: 700px;
+      max-width: 100%;
+    }
+
+    .text-content {
+      flex: 1;
+      min-width: 0;
+      text-align: left;
+      word-wrap: break-word;
+      overflow-wrap: break-word;
+    }
+
+    .text-content h1 {
+      font-size: 16px;
+      line-height: 1.2;
+      word-wrap: break-word;
+      overflow-wrap: break-word;
+    }
+
+    .text-content p {
+      font-size: 14px;
+      margin: 0;
+      word-wrap: break-word;
+      overflow-wrap: break-word;
+    }
+
+
+    .showcase {
+      flex-direction: column; 
+      align-items: center;
+      justify-content: center;
+      text-align: left;
+      gap: 15px;
+
+      /* ✅ Prevent horizontal overflow */
+      padding: 20px;
+      max-width: 100%;
+      overflow-x: hidden;
+      box-sizing: border-box;
+      flex-wrap: nowrap;
+    }
+
+    .showcase .logo {
+      flex: 0 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .showcase .logo img {
+      height: 70px;
+      width: 70px;
+      max-width: 100%;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+
+    .text-content {
+      flex: 1;
+      min-width: 0; /* Important to prevent overflow */
+      text-align: left;
+      word-wrap: break-word;
+      overflow-wrap: break-word;
+    }
+  }
+
+
+  .showcase {
+    color: #ffffff;
+    padding: 30px;
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column; /* ⬅️ Make items stack vertically */
+    align-items: center;
+    justify-content: center;
+    flex-wrap: nowrap;
+    gap: 10px;
+    text-align: center;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    /* margin-top: 20%; */
+    background: linear-gradient(
+      to right,
+      rgba(1, 3, 4, 0.755),
+      rgba(7, 27, 51, 0.623)
+    ) !important;
+  }
+
+
+  .text-content {
+    flex: 1;
+    min-width: 250px;
+    text-align: center;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+  }
+
+  .showcase .logo {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .showcase .logo img {
+    height: 140px;
+    width: 140px;
+    max-width: 150px;
+    border-radius: 50%;
+    object-fit: cover;
+  }
+
+  .showcase-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2;
+    padding: 20px;
+    box-sizing: border-box;
+    max-width: 100%;
+    overflow: hidden;
+  }
+
+
+  /* ------------------------------------------------------------CAROUSEL---------------------------------------------- */
+
+  /* Carousel Styles */
+  .carousel-inner .carousel-item img {
+    width: 100%;
+    object-fit: cover;
+    pointer-events: none;
+  }
+
+  .custom-carousel {
+    width: 100%;
+    height: 100vh; /* Full screen height */
+    position: relative;
+    z-index: auto;
+    pointer-events: none;
+
+  }
+
+  .custom-carousel, .carousel-inner, .carousel-item {
+    position: relative;
+    width: 100%;
+    height: 100vh;
+    min-height: 320px;
+    max-height: 100vh;
+    overflow: hidden;
+    z-index: auto;
+  }
+
+  .carousel-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  .showcase-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2;
+    padding: 0;
+    box-sizing: border-box;
+    max-width: 100%;
+    max-height: 100%;
+    overflow: hidden;
+  }
+
+  .showcase {
+    width: 100%;
+    max-width: 100%;
+    max-height: 100%;
+    box-sizing: border-box;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 2vw 2vw;
+  }
+  .showcase .logo img {
+    height: 140px;
+    width: 140px;
+    max-width: 80px;
+    min-width: 32px;
+    border-radius: 50%;
+    object-fit: cover;
+    max-height: 80px;
+    width: 100%;
+    box-sizing: border-box;
+  }
+  .text-content {
+    flex: 1;
+    min-width: 0;
+    text-align: center;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    max-width: 100%;
+    box-sizing: border-box;
+    overflow: hidden;
+  }
+  .text-content h1, .text-content p {
+    font-size: 2vw;
+    max-width: 100%;
+    white-space: normal;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  @media (max-width: 768px) {
+    .custom-carousel, .carousel-inner, .carousel-item {
+      height: 45vw;
+      min-height: 180px;
+      max-height: 50vw;
+    }
+    .showcase {
+      padding: 1vw 1vw;
+      gap: 6px;
+    }
+    .showcase .logo img {
+      height: 16vw;
+      width: 16vw;
+      max-width: 60px;
+      min-width: 24px;
+      max-height: 60px;
+    }
+    .text-content h1, .text-content p {
+      font-size: 3vw;
+    }
+  }
+  @media (max-width: 480px) {
+    .custom-carousel, .carousel-inner, .carousel-item {
+      height: 38vw;
+      min-height: 120px;
+      max-height: 40vw;
+    }
+    .showcase .logo img {
+      height: 22vw;
+      width: 22vw;
+      max-width: 40px;
+      min-width: 16px;
+      max-height: 40px;
+    }
+    .text-content h1, .text-content p {
+      font-size: 4vw;
+    }
+  }
+  /* Smooth fade transition */
+  .carousel-fade .carousel-item {
+    opacity: 0;
+    transition: opacity 0.5s ease-in-out;
+    position: relative;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+  }
+  .carousel-fade .carousel-item.active {
+    opacity: 1;
+    position: relative;
+    z-index: 1;
+  }
+  .carousel-container {
+    position: relative;
+    height: 100vh;
+    overflow: hidden;
+
+  }
+
+
+  
+
+
+
+  /* FLEX CONTAINERS */
+  /* ✅ FLEX CONTAINERS */
+  .flex-container-headings {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    font-size: 2rem;
+    letter-spacing: 2px;
+    color: #ffffff;
+    margin-bottom: 50px;
+    margin-top: 90px;
+    font-weight: 700;
+    text-shadow: 0 2px 8px rgba(33, 150, 243, 0.08);
+    opacity: 1; /* Fully visible now */
+    margin-bottom: 100px;
+  }
+
+  .flex-container-headings h2 {
+    margin: 0;
+    width: 400px;
+    max-width: 90vw;
+    text-align: center;
+    font-size: 2rem;
+    font-weight: 700;
+    padding: 8px;
+
+    /* Gradient background */
+    background: linear-gradient(
+      to right,
+      rgba(3, 18, 115, 0.85),
+      rgba(3, 18, 115, 0.3)
+    );
+    border-radius: 50px;
+
+    /* Shadow under background */
+    box-shadow: 10px 10px 18px rgba(0, 0, 0, 1);
+  }
+
+
+
+  /* -----------------------------------------Headings from About to trainings/Responsive------------------------------ */
+/* 📱 Tablet + Mobile */
+@media (max-width: 992px) {
+  .flex-container-headings{
+    margin-bottom: 80px !important;         
+    margin-top: 80px !important; 
+  }
+  .flex-container-headings h2 {
+    font-size: 1.6rem !important;   /* shrink heading */
+    width: 90% !important;          /* take up most of screen */
+    max-width: 600px !important;    /* but don’t stretch too far */
+    padding: 8px !important;
+  }
+}
+
+/* 📱 Small Mobile */
+@media (max-width: 576px) {
+  .flex-container-headings h2 {
+    font-size: 1.3rem !important;   /* smaller heading */
+    width: 95% !important;          /* full width feel */
+    max-width: 480px !important;    /* still balanced */
+    padding: 6px !important;
+  }
+}
+
+
+
+  .responsive-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 20px;
+    padding: 1.5rem;
+    background: #f9fbfd;
+
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+  }
+
+  /* ✅ Card Body Boxes */
+  .flex-container {
+    display: flex;
+    justify-content: center;
+    padding: 1.25rem;
+    background: linear-gradient(to bottom, #0ec1f8, #0038a0);
+    border-radius: 0 0 12px 12px;
+
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+  }
+
+  .flex-container .box {
+    background-color: #ffffff;
+    color: #000;
+    padding: 1.25rem;
+    border-radius: 10px;
+    width: 100%;
+    max-width: 500px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    line-height: 1.8;
+    font-size: 1rem;
+
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    hyphens: auto;
+    text-align: justify;
+  }
+
+  /* ✅ Hover Animation */
+  .flex-container .box:hover {
+    transform: scale(1.05);
+    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.3);
+  }
+
+  /* ✅ Responsive Breakpoint */
+  @media (max-width: 768px) {
+    .mission-group,
+    .vision-group {
+      flex: 1 1 90%;
+    }
+  } */
+
+  /* ✅ Smooth Transitions */
+  .card,
+  .box,
+  h2 {
+    transition: all 0.3s ease;
+  }
+
+
+
+  /* ----------------------------------------------------------------CARDS------------------------------------------------------- */
+  .card-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: center;
+    align-items: stretch; /* ensures all cards match tallest one */
+
+    
+    word-wrap: break-word;
+      overflow-wrap: break-word;
+  }
+
+  .card {
+    flex: 1 1 250px;
+    max-width: 300px;
+    background: linear-gradient(to bottom right, #2196F3, #1976D2);
+    color: white;
+    padding: 20px;
+    border-radius: 20px;
+    border: none;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    text-align: center;
+    transition: transform 0.3s ease, box-shadow 0.3s ease, filter 0.3s ease;
+
+      word-wrap: break-word;
+      overflow-wrap: break-word;
+  }
+
+  .card:hover {
+
+    transform: scale(1.05);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.3);
+    filter: brightness(1.05);
+  }
+
+  .card img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 10px;
+    margin-bottom: 10px;
+  }
+
+  .card p {
+    margin: 0;
+  }
+
+  .card-descript {
+    flex: 1 1 250px;
+    max-width: 300px;
+    background: linear-gradient(to bottom right, #2196F3, #1976D2);
+    color: white;
+    padding: 20px;
+    border-radius: 20px;
+    border: none;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    text-align: center;
+    transition: transform 0.3s ease, box-shadow 0.3s ease, filter 0.3s ease;
+    animation: fadeInUp 0.8s ease-out forwards;
+
+      min-width: 0; /* Important to prevent overflow */
+      text-align: left;
+      word-wrap: break-word;
+      overflow-wrap: break-word;
+  }
+
+  .card-descript:hover {
+    transform: scale(1.05);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.3);
+    filter: brightness(1.05);
+  }
+
+  .card-descript img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 10px;
+    margin-bottom: 10px;
+  }
+
+  .card-descript p {
+    margin: 0;
+  }
+  @media (max-width: 768px) {
+    .card-container {
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .card, .card-descript {
+      width: 90%;
+      max-width: 400px;
+
+      min-width: 0; /* Important to prevent overflow */
+      text-align: left;
+      word-wrap: break-word;
+      overflow-wrap: break-word;
+    }
+  }
+
+  /* ----------------------------------------------------------FOOTER ------------------------------------------------------*/
+footer {
+  background: linear-gradient(to right, #031273, #2196F3);
+  color: #fff;
+  text-align: center;
+  padding: 20px;
+  margin: 4px 0;
+  line-height: 1.4; /* ✅ normal readable spacing */
+  font-size: 14px; /* ✅ default font size */
+}
+  .footer-logos {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 15px; /* space between logos */
+    margin-bottom: 10px;
+    margin-top: 10px;
+  }
+
+  .footer-logo {
+    width: 50px;
+    height: 50px;
+    object-fit: cover;
+    border-radius: 50%;
+    background: var(--white);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  }
+
+/* 📱 Mobile optimization */
+@media (max-width: 768px) {
+  footer {
+    line-height: 1.6; /* more breathing room */
+    font-size: 12px;  /* smaller text to avoid overlap */
+    padding: 15px;   /* slightly tighter padding */
+  }
+
+  .footer-logos {
+    flex-wrap: wrap; /* ✅ makes logos go to next line instead of squishing */
+    gap: 10px;
+  }
+}
+
+
+
+
+
+  /* -----------------------------------------------------------NAVIGATION CSS----------------------------------------------------------- */
+
+  /* base */
+  /* Logo sizing */
+.navbar-logo {
+  height: 60px;  /* bigger logo */
+  width: auto;
+  border-radius: 30px;
+}
+/* Navbar base */
+.navbar {
+  position: relative; /* starts in normal flow under carousel */
+  top: 0;
+  width: 100%;
+  transition: transform 0.4s ease-in-out;
+  z-index: 9999;
+}
+
+/* Fixed state */
+.navbar.fixed {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+}
+
+/* Hide on scroll down */
+.navbar.hidden {
+  transform: translateY(-100%);
+}
+
+/* Leaving fixed state (smooth fade under carousel) */
+.navbar.leaving {
+  opacity: 0;
+  transform: translateY(-20px);
+}
+
+
+/* Center links nicely with spacing */
+.navbar-nav {
+  gap: 1.5rem;
+}
+
+/* Datetime styling */
+#datetime {
+  font-size: 0.95rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+
+
+/*----------------------------------------------------- Mobile View Setup /responsive for nav bar------------------------------------------- */
+
+
+@media (min-width: 992px) {
+  .navbar-nav {
+    margin-left: 50px; /* adjust this value as needed */
+    margin-right: auto;
+  }
+}
+/* Tablet mode adjustments */
+@media (min-width: 768px) and (max-width: 991px) {
+  /* Make navbar flex properly */
+  .navbar .container-fluid {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  /* Brand/logo always on the left */
+  .navbar-brand {
+    order: 1;
+    margin-right: 1rem;
+  }
+
+  /* Datetime stays centered */
+  #datetime {
+    order: 2;
+    flex: 1;
+    text-align: center;
+  }
+
+  /* Toggle button on the right */
+  .navbar-toggler {
+    order: 3;
+    margin-left: auto;
+  }
+
+  /* Dropdown menu (collapse) should drop downward */
+  .navbar-collapse {
+    width: 100%;
+    order: 4;
+    margin-top: 0.5rem;
+  }
+
+  .navbar-nav {
+    flex-direction: column; /* vertical stack */
+    text-align: center;
+    gap: 0.5rem;
+  }
+}
+@media (max-width: 576px) {
+  #datetime {
+    width: 100%;          /* take full width */
+    text-align: center;   /* center the text */
+    margin: 0.5rem 0;     /* add spacing above/below */
+  }
+}
+
+
+/* Mobile Navbar: center ul links */
+@media (max-width: 576px) {
+    .navbar-nav {
+        width: 100%;          /* full width of container */
+        display: flex;         /* use flex to center */
+        flex-direction: column; /* stack vertically */
+        align-items: center;   /* center horizontally */
+        text-align: center;
+        gap: 0.5rem;
+        margin: 0;             /* remove default spacing */
+        padding: 0;            /* remove default padding */
+    }
+
+    .navbar-nav .nav-item {
+        width: auto;           /* let each link size naturally */
+    }
+
+    .navbar-nav .nav-link {
+        display: inline-block;
+        width: auto;
+        text-align: center;
+    }
+}
+@media (min-width: 1024px) {
+  .navbar .container-fluid {
+    display: flex;
+    align-items: center;
+  }
+
+  .navbar-nav {
+    display: flex !important;
+    flex-direction: row !important;
+    justify-content: flex-start !important;  /* align links to the left */
+    margin-left: 0 !important;                /* remove Bootstrap default margin */
+    padding-left: 0 !important;              /* remove default padding */
+    gap: 1rem !important;                     /* spacing between links */
+  }
+
+  .navbar-nav .nav-item {
+    width: auto !important;
+  }
+
+  .navbar-nav .nav-link {
+    padding: 0.5rem 1rem; /* adjust spacing between links */
+  }
+}
+
+  .fade-in-up {
+    opacity: 0;
+    transform: translateY(20px);  /* slide up from 20px below */
+    animation: fadeInUp 0.8s ease-out forwards;
+  }
+  .fade-delay-1 {
+    animation-delay: 0.4s;
+  }
+  .fade-delay-2 {
+    animation-delay: 0.7s;
+  }
+
+  @keyframes fadeInUp {
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  .card-title {
+    text-align: center;
+    margin-bottom: 12px;
+    color: #031273;
+    font-size: 1.5rem;
+    background: none;
+    box-shadow: none;
+    border-radius: 0;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+  }
+  .card-title i {
+    color: #2196F3;
+  }
+
+  /* SERVICES */
+  .service-card {
+    background: #2196f3;
+    border-radius: 20px;
+    border: 2px solid black;
+    color: white;
+    text-align: left;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    overflow: hidden;
+    max-width: 300px;
+    flex: 1 1 250px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+
+  .service-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+  }
+
+  .service-card img {
+    width: 100%;
+    height: 160px;
+    object-fit: cover;
+    border-bottom: 2px solid white;
+  }
+
+  .service-card .p-3 {
+    padding: 15px;
+  }
+
+  .service-card h3 {
+    font-size: 1.2rem;
+    font-weight: bold;
+    margin-bottom: 6px;
+    color: #ffffff;
+  }
+
+  .service-card span {
+    font-size: 0.7rem;
+    background-color: #ffffff;
+    color: #031273;
+    padding: 4px 8px;
+    border-radius: 8px;
+    display: inline-block;
+    margin-bottom: 6px;
+  }
+
+  .service-card p {
+    font-size: 0.85rem;
+    color: #e0e0e0;
+    line-height: 1.4;
+  }
+
+  .category-divider {
+      display: inline-block;
+      padding: 0.4rem 1rem;
+      margin: 2rem 0 1rem;
+      background-color: #eff6ff;
+      border-left: 6px solid #2563eb;
+      border-radius: 8px;
+      font-weight: 600;
+      color: #1e40af;
+  }
+  /* ---------------------------------ALL THE BOXES----------------------------------- */
+
+  .mv-card.bg-white,
+  .mv-card.rounded-4,
+  .about-desc-box, 
+  .officials-wrapper .card-container .card,
+  .training-desc-box,
+  .ambulance-card{
+    background: linear-gradient(
+      to right,
+      rgba(241, 241, 241, 0.755),
+      rgba(255, 255, 255, 0.741)
+    ) !important;
+    color: #ffffff;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    filter: none !important;
+    transition: background 0.3s, box-shadow 0.3s, transform 0.3s;
+    border-radius: 50px !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    filter: none !important;
+  }
+
+  /* --- Mission & Vision Section --- */
+  .mv-wrapper {
+    position: relative;
+    overflow: hidden;
+    min-height: 120vh;
+    width: 100%;
+    margin-bottom: 0;
+    padding-bottom: 5%;
+  }
+  .pad{
+    margin-top: 20%;
+  }
+  .mv-wrapper > *:not(.mv-bg-img) {
+    position: relative;
+    z-index: 1;
+  } 
+  .mv-bg-img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%; /* Stretch to match wrapper height */
+    max-height: none;
+    object-fit: cover;
+    z-index: 0;
+    pointer-events: none;
+  }
+  .mv-card {
+    color: white;
+    border-radius: 50px !important;
+    box-sizing: border-box;
+    padding: 2.5rem 1.5rem 2rem 1.5rem;
+    padding-bottom: 50%;
+    min-height: 340px;
+    width: 100%;
+    height: auto !important;
+    margin-top: 100px;
+    margin-bottom: 0;
+    position: relative;
+    overflow: hidden;
+    transition: box-shadow 0.2s, transform 0.2s;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    transition: transform 0.3s ease, box-shadow 0.3s ease, filter 0.3s ease;
+    transition: background 0.3s, box-shadow 0.3s, transform 0.3s;
+  }
+  .mv-card h2, .mv-card p {
+    color: rgb(0, 0, 0);
+  }
+  .mv-card.bg-white,
+  .mv-card.rounded-4:hover {
+    background: #1976d2;
+    transform: scale(1.05);
+    box-shadow: 0 12px 24px rgba(26, 26, 27, 0.4);
+  }
+  .mv-card.bg-white,
+  .mv-card.rounded-4 {
+    color: #ffffff;
+    border-radius: 50px !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    filter: none !important;
+    border: none !important;
+    outline: none !important;
+    margin-top: 100px;
+    margin-bottom: 50px;
+  }
+
+  .mv-title {
+      background: linear-gradient(
+      to right,
+      rgba(3, 18, 115, 0.85),  
+      rgba(3, 18, 115, 0.577)
+    ) !important;
+    color: #ffffff;
+    border-radius: 50px !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    filter: none !important;
+    font-size: 2rem;
+    letter-spacing: 2px;
+    color: #ffffff;
+    margin-top: 90px;
+    font-weight: 700;
+    padding: 0.4rem 1rem;
+    border-radius: 50px !important;
+    box-shadow: 10px 10px 18px rgba(0, 0, 0, 1);
+  }
+
+  .mv-divider {
+    width: 60px;
+    height: 4px;
+    background: linear-gradient(90deg, #0ec1f8 0%, #2196F3 100%);
+    border-radius: 2px;
+    margin: 0 auto 1rem auto;
+  }
+  .mv-text {
+    color: #ffffff;
+    font-size: 1.18rem;
+    font-weight: 500;
+    line-height: 1.8;
+    margin-top: 0.5rem;
+    text-align: center;
+    text-shadow: 0 1px 4px rgba(11, 12, 12, 0.611);
+    overflow-wrap: break-word;
+    word-break: break-word;
+    white-space: pre-line;
+  }
+
+  /* --------------------------------------------- Responsiveness in Misssion Vision---------------------------------------------- --- */
+
+/* Tablet + Mobile Fix */
+@media (max-width: 992px) {
+  .mv-wrapper{
+    padding-bottom: 70px !important;
+  }
+  .mv-card {
+    margin-top: 30px !important;   
+    margin-bottom: 0px !important;           
+  }
+
+  .mv-card h2,
+  .mv-card p,
+  .mv-text {
+    font-size: 1rem !important;   /* shrink text */
+    line-height: 1.6 !important;
+  }
+
+  .mv-title {
+    width: 90% !important;
+    font-size: 1.6rem !important; /* shrink main title */
+    margin-bottom: 80px !important;         
+    margin-top: 80px !important;   
+  }
+}
+
+/* Small mobile */
+@media (max-width: 576px) {
+  .mv-card {
+    margin-top: 5px !important;    
+    margin-bottom: 15px;
+  }
+
+   .mv-card h2,
+  .mv-card p,
+  .mv-text {
+    font-size: 0.9rem !important; /* shrink more */
+    line-height: 1.5 !important;
+  }
+
+  .mv-title {
+    width: 110% !important;
+    font-size: 1.4rem !important; 
+  }
+}
+
+
+
+
+
+  /* --------------------------ABOUT DESC BOX--------------------- */
+  .about-bg-img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%; /* Stretch to match wrapper height */
+    max-height: none;
+    object-fit: cover;
+    z-index: 0;
+    pointer-events: none;
+  }
+
+  .about-wrapper {
+    position: relative;
+    overflow: hidden;
+    min-height: 100vh;
+    width: 100%;
+    margin-bottom: 0;
+    padding-bottom: 5%;
+  }
+
+  .about-wrapper > *:not(.about-bg-img) {
+    position: relative;
+    z-index: 1;
+  }
+  .about-desc-box {
+    display: flex;
+    flex-direction: column;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+    white-space: pre-line;
+    min-height: 340px;
+    max-height: 510px;
+    height: auto;
+    padding-bottom: 25px;
+    margin-bottom: 10px;
+    transition: background 0.3s, box-shadow 0.3s, transform 0.3s;
+    padding: 1.5rem; /* replaces p-4 */
+    justify-content: center;
+
+    border: none !important;
+    outline: none !important;
+    color: #000000;
+    border-radius: 50px !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    filter: none !important;
+    border: none !important;
+    outline: none !important;
+  }
+  .about-image-left {
+    object-fit: cover;
+    border-radius: 0;
+    min-height: 260px;
+    max-height: 320px;
+    margin-left: 0;
+    margin-right: 20px;
+  }
+
+  .about-image-right {
+    object-fit: cover;
+    border-radius: 0;
+    min-height: 260px;
+    max-height: 320px;
+    margin-right: 0;
+    margin-left: 20px;
+  }
+  .about-desc-left {
+    margin-left: 20px;
+  }
+  .about-desc-right {
+    margin-right: 20px;
+  }
+
+  .about-desc-box strong {
+    font-size: 1.2rem;
+  }
+
+  /* ✅ Text content in About box */
+  .about-desc-box span {
+    font-size: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .about-desc-box:hover {
+    background: #1976d2;
+    transform: scale(1.05);
+    box-shadow: 0 12px 24px rgba(33, 150, 243, 0.4);
+  }
+
+
+  /* --------------------------------------------- Responsiveness in About MDRRMO ---------------------------------------------- --- */
+
+/* 📱 Mobile: fully responsive About section */
+@media (max-width: 767.98px) {
+
+  /* Stack each inner row vertically and center everything */
+  .about-wrapper .row.w-100,
+  .about-wrapper .about-row-reverse {
+    display: flex !important;
+    flex-direction: column !important; /* image above info */
+    align-items: center; /* center horizontally */
+    text-align: center; /* center inline content */
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  /* Make all columns full width and remove margin/padding */
+  .about-wrapper .row.w-100 > [class*="col-"],
+  .about-wrapper .about-row-reverse > [class*="col-"] {
+    width: 100% !important;
+    max-width: 100% !important;
+    display: block !important;
+    margin: 0 0 15px 0 !important;
+    padding: 0 !important;
+  }
+
+  /* Images: full width, centered, no side margins */
+  .about-wrapper .about-image-left,
+  .about-wrapper .about-image-right {
+    width: 100% !important;
+    max-width: 100% !important;
+    height: auto !important;
+    object-fit: cover;
+    border-radius: 12px !important;
+    margin: 0 0 10px 0 !important;
+    display: block !important;
+  }
+
+  /* Info boxes: full width, centered, remove side spacing */
+  .about-wrapper .about-desc-box {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 0 20px 0 !important;
+    padding: 1rem !important;
+    text-align: center !important;
+    border-radius: 12px !important;
+    display: block !important;
+  }
+
+  .about-desc-box strong {
+    font-size: 1.1rem !important;   /* shrink title a bit */
+    line-height: 1.5 !important;
+  }
+
+  .about-desc-box span {
+    font-size: 0.95rem !important;  /* shrink text slightly */
+    line-height: 1.5 !important;
+  }
+}
+
+/* 📱 Small Mobile */
+@media (max-width: 576px) {
+  .about-desc-box strong {
+    font-size: 1rem !important;     /* even smaller title */
+    line-height: 1.4 !important;
+  }
+
+  .about-desc-box span {
+    font-size: 0.7rem !important;  /* even smaller text */
+    line-height: 1.4 !important;
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+  /* --------------------------OFFICIALS WRAPPER--------------------- */
+  .officials-wrapper {
+    position: relative;
+    overflow: hidden;
+    min-height: 100vh;
+    width: 100%;
+    margin-bottom: 0;
+    /* Remove max-height so it grows with content */
+    /* max-height: 100vh; */
+    padding-bottom: 5%;
+  }
+  .officials-bg-img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%; /* Stretch to match wrapper height */
+    max-height: none;
+    object-fit: cover;
+    z-index: 0;
+    pointer-events: none;
+  }
+  .officials-wrapper > *:not(.officials-bg-img) {
+    position: relative;
+    z-index: 1;
+  }
+
+  .officials-wrapper .card-container .card {
+    color: #ffffff;
+    border-radius: 50px !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    filter: none !important;
+    border: none !important;
+    outline: none !important;
+  }
+  .officials-wrapper .card h3, .officials-wrapper .card p {
+    color: rgb(0, 0, 0);
+  }
+  .officials-wrapper .card:hover {
+    background: #1976d2;
+    transform: translateY(-5px);
+    box-shadow: 0 12px 32px rgba(33, 150, 243, 0.4);
+  }
+
+  /* --------------------------------------------- Responsiveness in Officials ---------------------------------------------- --- */
+
+
+  /* Mobile: center text in Officials cards */
+@media (max-width: 767.98px) {
+  .officials-wrapper .card-container .card {
+    text-align: center !important; /* center all text inside card */
+    margin-left: auto !important;
+    margin-right: auto !important;
+  }
+
+  .officials-wrapper .card h3,
+  .officials-wrapper .card p {
+    text-align: center !important; /* ensure headings and paragraphs are centered */
+  }
+
+  /* Optional: make card width responsive */
+  .officials-wrapper .card-container .card {
+    width: 90% !important;
+    max-width: 100% !important;
+  }
+}
+
+
+  /* --------------------------TRAININGS WRAPPER--------------------- */
+  .trainings-wrapper {
+    position: relative;
+    overflow: hidden;
+    min-height: 60vh;
+    width: 100%;
+    margin-bottom: 0;
+    padding-bottom: 5%;
+
+  }
+  .trainings-bg-img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: 0;
+    pointer-events: none;
+    filter: grayscale(0.2) blur(1px);
+  }
+
+  .trainings-wrapper > *:not(.trainings-bg-img) {
+    position: relative;
+    z-index: 1;
+  }
+
+.training-desc-box {
+  display: block !important;     /* no flex stretching */
+  height: auto !important;       /* natural height = text height */
+  min-height: auto !important;   /* removes forced min height */
+  max-height: none !important;   /* allow growth with text */
+  padding: 1rem;                 /* clean spacing */
+  margin: 0 auto; 
+  margin-left: 30px;             /* center inside column */
+  text-align: center;            /* keep your centered text */
+  color: rgb(0, 0, 0);
+  word-break: break-word;
+  overflow-wrap: anywhere;
+  white-space: normal;
+
+  /* ✅ Override border radius */
+  border-radius: 0 !important;   /* or set your custom value */
+}
+
+  .training-row-reverse .training-desc-box {
+    margin-left: 0;
+    margin-right: 18px;
+  }
+
+  .trainings-wrapper .training-desc-box strong {
+    font-size: 1rem;   /* slightly smaller title */
+    margin-bottom: 0.3rem;
+    display: block;               /* makes centering apply properly */
+    text-align: center;
+    width: 100%;                  /* ensure it spans full width */
+  }
+
+  .training-desc-box:hover {
+    background: #1976d2;
+    transform: scale(1.05);
+  }
+
+  .trainings-wrapper img:hover {
+    transform: scale(1.05);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.3);
+    filter: brightness(1.05);
+    transition: transform 0.3s ease, box-shadow 0.3s ease, filter 0.3s ease;
+  }
+
+  .trainings-wrapper .card {
+    background: #2196f3;
+    border: 2px solid #1976d2;
+    box-shadow: 0 8px 24px rgba(33, 150, 243, 0.3);
+    color: rgb(0, 0, 0);
+    transition: background 0.3s, box-shadow 0.3s, transform 0.3s;
+  }
+  .trainings-wrapper .card h3, .trainings-wrapper .card p {
+    color: rgb(0, 0, 0);
+  }
+  .trainings-wrapper .card:hover {
+    background: #1976d2;
+    transform: translateY(-5px);
+    box-shadow: 0 12px 32px rgba(33, 150, 243, 0.4);
+  }
+
+  .trainings-wrapper .training-desc-box span {
+    color: #000;
+  }
+
+.trainings-wrapper .training-desc-box strong {
+  color: #000;
+}
+
+/* --------------------------------------------- Responsiveness in Trainings ---------------------------------------------- --- */
+
+/* 📱 Mobile: fully responsive Trainings section */
+@media (max-width: 767.98px) {
+
+  /* Stack each inner row vertically and center everything */
+  .trainings-wrapper .col-md-6 > .row {
+    display: flex !important;
+    flex-direction: column !important; /* image above info */
+    align-items: center; /* center horizontally */
+    text-align: center; /* center text inside */
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  /* Image: full width, centered, no side margins */
+  .trainings-wrapper .col-md-6 > .row .col-6:first-child {
+    display: block !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    max-height: none !important;
+    margin: 0 0 10px 0 !important; /* spacing below image */
+    padding: 0 !important;
+  }
+
+  /* Info box: full width, centered, no side margins */
+  .trainings-wrapper .col-md-6 > .row .col-6:last-child {
+    display: block !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 0 15px 0 !important;
+    padding: 0 !important;
+  }
+
+  .trainings-wrapper .col-md-6 > .row .col-6:last-child .training-desc-box {
+    margin: 0 auto !important;
+    padding: 1rem !important;
+    text-align: center !important;
+    min-height: auto;
+    max-height: none;
+    border-radius: 12px !important;
+  }
+
+  /* Image adjustments */
+  .trainings-wrapper .col-md-6 > .row img {
+    display: block;
+    width: 100% !important;
+    height: auto !important;
+    object-fit: cover;
+    border-radius: 12px !important;
+  }
+
+  .trainings-wrapper .training-desc-box {
+    font-size: 0.9rem !important;   /* shrink text */
+    line-height: 1.4 !important;    /* tighter spacing */
+    word-break: break-word;
+    overflow-wrap: anywhere;
+    white-space: normal;
+  }
+
+.trainings-wrapper .training-desc-box span {
+    font-size: 0.7rem !important;   /* smaller description */
+    line-height: 1.3 !important;    /* tighter spacing */
+    display: block;                 /* make sure it wraps naturally */
+    word-break: break-word;
+    overflow-wrap: anywhere;
+    white-space: normal;
+  }
+
+.trainings-wrapper .training-desc-box strong {
+  font-size: 1rem !important;   /* slightly smaller title */
+  margin-bottom: 0.3rem;
+  display: block;               /* makes centering apply properly */
+  text-align: center !important;
+  width: 100%;                  /* ensure it spans full width */
+}
+}
+
+
+
+
+
+
+
+
+  /* --------------------------AMBULANCE WRAPPER--------------------- */
+  .ambulance-wrapper {
+    position: relative;
+    overflow: hidden;
+    min-height: 60vh;
+    width: 100%;
+    margin-bottom: 0;
+  }
+  .ambulance-bg-img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: 0;
+    pointer-events: none;
+    filter: grayscale(0.2) blur(1px);
+  }
+  
+  .ambulance-title h2{
+        background: linear-gradient(
+      to right,
+      rgba(3, 18, 115, 0.85),  
+      rgba(3, 18, 115, 0.577)    
+    ) !important;
+    color: #ffffff;
+    border-radius: 50px !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    filter: none !important;
+    font-size: 2rem;
+    letter-spacing: 2px;
+    color: #ffffff;
+    margin-bottom: 0.5rem;
+    margin-top: 100px;
+    font-weight: 700;
+    padding: 0.4rem 1rem;
+    border-radius: 50px !important;
+    box-shadow: 10px 10px 18px rgba(0, 0, 0, 1);
+  }
+  .ambulance-wrapper > *:not(.ambulance-bg-img) {
+    position: relative;
+    z-index: 1;
+  }
+
+  .ambulance-card-container {
+    width: 100%;
+    padding: 3rem 0;
+    margin-top: 1%;
+  }
+
+  .ambulance-card {
+    color: white;
+    padding: 3rem 4rem;
+    border-radius: 20px;
+    text-align: center;
+    min-width: 600px;
+    max-width: 90vw;
+    transition: background 0.3s, box-shadow 0.3s, transform 0.3s;
+  }
+  .ambulance-card p {
+    color: rgb(0, 0, 0);
+    font-size: 1.2rem;
+    margin-bottom: 1rem;
+  }
+  .ambulance-card h1 {
+    color: rgb(0, 0, 0);
+    font-size: 4rem;
+    font-weight: bold;
+    margin: 0;
+  }
+  .ambulance-card:hover {
+    background: #1976d2;
+    transform: translateY(-5px);
+    box-shadow: 0 12px 32px rgba(33, 150, 243, 0.4);
+  }
+
+  .ambulance-wrapper .flex-container-headings h2 {
+    text-align: center;
+    color: #fff;
+    background: linear-gradient(to right, #031273, #2196F3);
+    border-radius: 50px;
+    border: none;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    font-weight: 700;
+    letter-spacing: 1px;
+    width: 400px;
+    max-width: 90vw;
+    padding: 12px 0;
+  }
+
+/* --------------------------------------------- Responsiveness in Ambulance ---------------------------------------------- --- */
+
+
+/* Mobile responsive for Ambulance cards */
+@media (max-width: 767.98px) {
+  .ambulance-card-container {
+    padding: 2rem 0.5rem !important;
+  }
+
+  .ambulance-card {
+    min-width: auto !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    padding: 2rem 0.5rem !important;
+    box-sizing: border-box;
+    border-radius: 16px;
+    text-align: center;
+    margin: 0 auto 1.5rem auto;
+  }
+
+  /* Make the title fill the card width */
+  .ambulance-card h1 {
+    width: 100% !important; /* fill the card width */
+    font-size: 13vw; /* scale based on viewport width */
+    line-height: 1.1;
+    word-wrap: break-word;
+    margin: 0 auto 1rem auto;
+  }
+
+  .ambulance-card p {
+    font-size: 1.5rem !important;
+    margin-bottom: 0.8rem;
+  }
+
+  /* Ensure container does not overflow */
+  .ambulance-wrapper {
+    overflow-x: hidden;
+  }
+    .ambulance-wrapper .flex-container-headings h2 {
+    font-size: 1.2rem !important;   /* even smaller for small phones */
+    width: 95% !important;
+    max-width: 480px !important;
+    padding: 6px !important;
+  }
+
+  .ambulance-title{
+    margin-bottom: 23px !important;
+  }
+    .ambulance-title h2 {
+    font-size: 1.3rem !important;
+    padding: 0.3rem 0.6rem !important;
+  }
+}
+
+
+
+
+/* 📱 Tablet + Mobile */
+@media (max-width: 992px) {
+  .ambulance-wrapper .flex-container-headings h2 {
+    font-size: 1rem !important;   /* shrink heading a bit */
+    width: 90% !important;
+    max-width: 600px !important;
+    padding: 8px !important;
+  }
+
+    .ambulance-title{
+    margin-bottom: 23px !important;
+    margin-top: -30px !important;
+  }
+    .ambulance-title h2 {
+    font-size: 1.3rem !important;
+    padding: 0.4rem 0.8rem !important;
+  }
+}

@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SILANG MDRRMO - Emergency Response System</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            padding: 40px;
+            text-align: center;
+            max-width: 600px;
+            width: 90%;
+        }
+        .logo {
+            width: 100px;
+            height: 100px;
+            margin: 0 auto 20px;
+            background: #031273;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+            font-weight: bold;
+        }
+        h1 {
+            color: #031273;
+            margin-bottom: 10px;
+            font-size: 2.5em;
+        }
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 1.2em;
+        }
+        .metrics {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+        .metric {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            border-left: 4px solid #031273;
+        }
+        .metric-value {
+            font-size: 2em;
+            font-weight: bold;
+            color: #031273;
+        }
+        .metric-label {
+            color: #666;
+            font-size: 0.9em;
+        }
+        .login-btn {
+            background: linear-gradient(135deg, #031273, #4CC9F0);
+            color: white;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 25px;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            margin-top: 20px;
+            transition: transform 0.3s ease;
+        }
+        .login-btn:hover {
+            transform: translateY(-2px);
+        }
+        .status {
+            background: #e8f5e8;
+            color: #2d5a2d;
+            padding: 10px 20px;
+            border-radius: 20px;
+            display: inline-block;
+            margin: 20px 0;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">MDRRMO</div>
+        <h1>SILANG MDRRMO</h1>
+        <p class="subtitle">Municipal Disaster Risk Reduction and Management Office</p>
+        
+        <div class="status">✅ System Online</div>
+        
+        <div class="metrics">
+            <div class="metric">
+                <div class="metric-value">0</div>
+                <div class="metric-label">Pending Cases</div>
+            </div>
+            <div class="metric">
+                <div class="metric-value">0</div>
+                <div class="metric-label">Active Cases</div>
+            </div>
+            <div class="metric">
+                <div class="metric-value">0</div>
+                <div class="metric-label">Online Drivers</div>
+            </div>
+            <div class="metric">
+                <div class="metric-value">0</div>
+                <div class="metric-label">Total Cases</div>
+            </div>
+        </div>
+        
+        <a href="/login" class="login-btn">Login to Dashboard</a>
+        
+        <p style="margin-top: 30px; color: #999; font-size: 0.9em;">
+            Emergency Response System • 24/7 Service Available
+        </p>
+    </div>
+</body>
+</html>
