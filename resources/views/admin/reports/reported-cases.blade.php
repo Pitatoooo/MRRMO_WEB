@@ -97,6 +97,17 @@
                 <h3>Reported Cases</h3>
             </div>
 
+            @if(session('success'))
+                <div style="background-color: #d4edda; color: #155724; padding: 10px; border-radius: 5px; margin-bottom: 15px;">
+                    {{ session('success') }}
+                </div>
+            @endif
+            @if(session('error'))
+                <div style="background-color: #f8d7da; color: #721c24; padding: 10px; border-radius: 5px; margin-bottom: 15px;">
+                    {{ session('error') }}
+                </div>
+            @endif
+
             <div class="search-row">
                 <form action="{{ route('reported-cases') }}" method="GET" style="display:flex; gap:10px; width:100%;">
                     <input type="text" name="search" placeholder="Search..." value="{{ request('search') }}">
@@ -127,10 +138,13 @@
                             $firstImage = is_array($images) && count($images) > 0 ? $images[0] : '';
                             
                             // Determine status color
-                            $statusColor = match($case->patient_status ?? 'Pending') {
-                                'Accepted' => '#16a34a', // Green
-                                'Completed' => '#2563eb', // Blue
-                                default => '#d97706', // Orange/Pending
+                            $statusColor = match($case->status ?? 'PENDING') {
+                                'PENDING' => '#d97706',      // Orange
+                                'ACKNOWLEDGED' => '#2563eb', // Blue
+                                'ON_GOING' => '#ca8a04',     // Yellow
+                                'RESOLVED' => '#16a34a',     // Green
+                                'DECLINED' => '#dc2626',     // Red
+                                default => '#64748b',       // Gray
                             };
                         @endphp
 
@@ -145,9 +159,16 @@
                         </td>
 
                         <td>
-                            <span class="status-badge" style="background:{{ $statusColor }}; color:white; padding:4px 8px; border-radius:6px; font-size:12px;">
-                                {{ $case->patient_status ?? 'Pending' }}
-                            </span>
+                            <form action="{{ route('admin.reports.updateStatus', $case->id) }}" method="POST" class="status-form">
+                                @csrf
+                                <select name="status" class="status-dropdown" onchange="this.form.submit()" style="background-color: {{ $statusColor }}; color: white; border-radius: 6px; font-size: 12px; padding: 4px 8px; border: none;">
+                                    @foreach(['PENDING', 'ACKNOWLEDGED', 'ON_GOING', 'RESOLVED', 'DECLINED'] as $status)
+                                        <option value="{{ $status }}" {{ ($case->status ?? 'PENDING') == $status ? 'selected' : '' }} style="background-color: #fff; color: #000;">
+                                            {{ ucfirst(strtolower(str_replace('_', ' ', $status))) }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </form>
                         </td>
                         <td style="font-size:12px; color:#64748b;">{{ \Carbon\Carbon::parse($case->incident_datetime)->setTimezone('Asia/Manila')->format('M d, Y h:i A') }}</td>
                         
@@ -170,7 +191,7 @@
                             <button class="btn-accept" 
                                 style="background:#22c55e; color:white;" 
                                 title="Accept & Notify"
-                                onclick="acceptReport('{{ $case->id }}', '{{ $case->user_id }}')">
+                                onclick="acceptReport('{{ $case->id }}')">
                                 ACCEPT
                             </button>
                             @endif
@@ -218,61 +239,69 @@
 <div id="liveStatus">CONNECTING...</div>
 
 <script>
-    // --- 1. ACCEPT REPORT FUNCTION (NEW) ---
-    async function acceptReport(reportId, userId) {
-    if (!confirm("Are you sure you want to ACCEPT this report?")) return;
+    // --- 1. ACCEPT REPORT FUNCTION (CORRECTED) ---
+    async function acceptReport(reportId) {
+        if (!confirm("Are you sure you want to ACCEPT this report?")) return;
 
-    // Update report status in Supabase
-    const { error: updateError } = await supabaseClient
-        .from('reports')
-        .update({ patient_status: 'Accepted' })
-        .eq('id', reportId);
+        // 1. Fetch the correct user_id from the 'reports' table.
+        const { data: reportData, error: fetchError } = await supabaseClient
+            .from('reports')
+            .select('user_id')
+            .eq('id', reportId)
+            .single();
 
-    if (updateError) {
-        alert("Error updating status: " + updateError.message);
-        return;
-    }
+        if (fetchError || !reportData) {
+            alert("Error fetching report details: " + (fetchError?.message || 'Report not found'));
+            return;
+        }
+        const userId = reportData.user_id;
 
-    // Send push via Laravel
-    try {
-        const res = await fetch("/api/send-push", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ user_id: userId, report_id: reportId })
-        });
+        // 2. Update the report status in Supabase.
+        const { error: updateError } = await supabaseClient
+            .from('reports')
+            .update({ status: 'ACKNOWLEDGED' })
+            .eq('id', reportId);
 
-        let data;
-        try {
-            data = await res.json();
-        } catch (err) {
-            console.error("Invalid JSON response", await res.text());
-            alert("Server returned an error. Check console for details.");
+        if (updateError) {
+            alert("Error updating report status: " + updateError.message);
             return;
         }
 
-        console.log("Push response:", data);
-        if (data.success) alert("✅ Report accepted and push sent!");
-        else alert("⚠️ Report accepted but push failed: " + data.error);
-    } catch (err) {
-        console.error(err);
-        alert("⚠️ Failed to send push. Check console.");
-    }
+        // 3. Send the push notification via the backend.
+        try {
+            const res = await fetch("/api/send-push", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                },
+                body: JSON.stringify({ user_id: userId, report_id: reportId })
+            });
 
-    // Update UI badge
-    const row = document.querySelector(`tr[data-id="${reportId}"]`);
-    if (row) {
-        const badge = row.querySelector('.status-badge');
-        if (badge) {
-            badge.innerText = "Accepted";
-            badge.style.background = "#16a34a";
+            const data = await res.json();
+
+            if (data.success) {
+                alert("✅ Report accepted and notification sent!");
+            } else {
+                alert("⚠️ Report accepted but push failed: " + data.error);
+            }
+        } catch (err) {
+            console.error('Push notification failed:', err);
+            alert("⚠️ Failed to send push notification. See console for details.");
         }
-        const btn = row.querySelector('.btn-accept');
-        if (btn) btn.remove();
+
+        // 4. Update the UI to reflect the change.
+        const row = document.querySelector(`tr[data-id="${reportId}"]`);
+        if (row) {
+            const statusDropdown = row.querySelector('.status-dropdown');
+            if (statusDropdown) {
+                statusDropdown.value = 'ACKNOWLEDGED';
+                statusDropdown.style.backgroundColor = '#2563eb'; // Blue for ACKNOWLEDGED
+            }
+            const btn = row.querySelector('.btn-accept');
+            if (btn) btn.remove();
+        }
     }
-}
-
-
-
 
     // --- 2. ADDRESS PROCESSING ---
     document.addEventListener("DOMContentLoaded", function() {
@@ -291,7 +320,7 @@
             const lat = cell.getAttribute('data-lat');
             const lng = cell.getAttribute('data-lng');
             const currentText = cell.innerText.trim();
-            const isCoordinates = /^-?\d+(\.\d+)?,\s*-?\d+(\.\d+)?$/.test(currentText);
+            const isCoordinates = /^-?\d+(\.\d+)?(,\s*-?\d+(\.\d+)?)$/.test(currentText);
 
             if (lat && lng && isCoordinates) {
                 try {
@@ -316,7 +345,7 @@
 
         document.getElementById('m_reporter').innerText = data.reporter_name || 'Guest';
         document.getElementById('m_type').innerText = data.incident_type || 'N/A';
-        document.getElementById('m_patient_status').innerText = data.patient_status || 'Pending';
+        document.getElementById('m_patient_status').innerText = data.status || 'Pending';
         document.getElementById('m_description').innerText = data.description || 'No description.';
         
         const dateObj = new Date(data.incident_datetime || data.created_at);
@@ -451,7 +480,7 @@
 
         let btnHtml = "";
         if (report.patient_status !== "Accepted") {
-            btnHtml = `<button class="btn-accept" style="background:#22c55e; color:white;" title="Accept" onclick="acceptReport('${report.id}', '${report.user_id}')">ACCEPT</button>`;
+            btnHtml = `<button class="btn-accept" style="background:#22c55e; color:white;" title="Accept" onclick="acceptReport('${report.id}')">ACCEPT</button>`;
         }
 
         const reportJson = encodeURIComponent(JSON.stringify(report));
@@ -476,7 +505,5 @@
         return row; // Return the row so we can update it later
     }
 });
-
-
 </script>
 @endsection

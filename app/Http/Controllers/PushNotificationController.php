@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 
 class PushNotificationController extends Controller
 {
@@ -19,7 +20,7 @@ class PushNotificationController extends Controller
 
             // Fetch user's expo_push_token from Supabase REST API
             $supabaseUrl = env('SUPABASE_URL') . '/rest/v1/users';
-            $supabaseKey = env('SUPABASE_KEY');
+            $supabaseKey = env('SUPABASE_SERVICE_ROLE_KEY', env('SUPABASE_KEY'));
 
             $response = Http::withHeaders([
                 'apikey' => $supabaseKey,
@@ -47,7 +48,32 @@ class PushNotificationController extends Controller
                 "data" => ["report_id" => $reportId]
             ]);
 
-            return response()->json(['success' => true, 'expo' => $pushResponse->json()]);
+            $expoJson = $pushResponse->json();
+            Log::info('Expo push response', [
+                'status' => $pushResponse->status(),
+                'body' => $expoJson,
+            ]);
+
+            // If HTTP failed, treat as push failure
+            if ($pushResponse->failed()) {
+                return response()->json([
+                    'success' => false,
+                    'error' => 'Expo push request failed',
+                    'expo' => $expoJson,
+                ], 500);
+            }
+
+            // Expo wraps results in data[0]
+            if (isset($expoJson['data'][0]['status']) && $expoJson['data'][0]['status'] === 'error') {
+                $message = $expoJson['data'][0]['message'] ?? 'Expo push error';
+                return response()->json([
+                    'success' => false,
+                    'error' => $message,
+                    'expo' => $expoJson,
+                ], 500);
+            }
+
+            return response()->json(['success' => true, 'expo' => $expoJson]);
 
         } catch (\Throwable $e) {
             return response()->json(['success' => false, 'error' => $e->getMessage()]);

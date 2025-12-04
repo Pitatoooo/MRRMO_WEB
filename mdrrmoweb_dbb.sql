@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Nov 23, 2025 at 06:27 PM
+-- Generation Time: Dec 03, 2025 at 11:43 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -59,9 +59,9 @@ CREATE TABLE `ambulances` (
 --
 
 INSERT INTO `ambulances` (`id`, `name`, `latitude`, `longitude`, `status`, `created_at`, `updated_at`, `destination_latitude`, `destination_longitude`, `destination_updated_at`) VALUES
-(1, 'AMBULANCE 1', 14.2259949, 120.9696230, 'Out', '2025-11-05 23:30:41', '2025-11-21 06:40:46', 14.2294571, 120.9714031, NULL),
+(1, 'AMBULANCE 1', 14.2259949, 120.9696230, 'Out', '2025-11-05 23:30:41', '2025-11-30 04:53:16', 14.2279558, 120.9736991, NULL),
 (2, 'AMBULANCE 2', NULL, NULL, 'Out', '2025-11-06 21:59:59', '2025-11-18 00:42:22', 14.2083483, 120.9750938, NULL),
-(3, 'AMBULANCE 3', NULL, NULL, 'Available', '2025-11-18 00:41:02', '2025-11-18 00:41:02', NULL, NULL, NULL);
+(3, 'AMBULANCE 3', NULL, NULL, 'Out', '2025-11-18 00:41:02', '2025-11-25 00:51:53', 14.2345127, 120.9765851, NULL);
 
 -- --------------------------------------------------------
 
@@ -224,7 +224,15 @@ INSERT INTO `cases` (`case_num`, `status`, `name`, `contact`, `age`, `date_of_bi
 (34, 'Completed', 'jay', '242342', NULL, NULL, 'TRAINING', 'Medium', 'Jemariel Hardware, Aguinaldo Highway, San Vicente II, Banaba, Silang, Cavite, Calabarzon, 4118, Philippines', NULL, 'Aguinaldo Highway, San Vicente II, Banaba, Silang, Cavite, Calabarzon, 4118, Philippines', 'Aguinaldo Highway, San Vicente II, Banaba, Silang, Cavite, Calabarzon, 4118, Philippines', NULL, 14.22640726, 120.96990108, 14.22742052, 120.96968114, '2025-11-17 07:20:56', 'Jay Mark', '242342', 1, 1, 1, '2025-11-16 23:20:35', '2025-11-16 23:20:56', '2025-11-16 23:20:56'),
 (35, 'Completed', 'jay', '242342', NULL, NULL, 'TRAINING', 'Medium', 'Aguinaldo Highway, San Vicente II, Banaba, Silang, Cavite, Calabarzon, 4118, Philippines', NULL, 'Aguinaldo Highway, San Vicente II, Banaba, Silang, Cavite, Calabarzon, 4118, Philippines', 'Aguinaldo Highway, San Vicente II, Banaba, Silang, Cavite, Calabarzon, 4118, Philippines', NULL, 14.22651083, 120.96989036, 14.22792419, 120.96979916, '2025-11-17 07:26:52', 'Jay Mark', '242342', 1, 1, 1, '2025-11-16 23:26:36', '2025-11-16 23:26:52', '2025-11-16 23:26:52'),
 (36, 'Completed', 'jay', '242342', NULL, NULL, 'TRAINING', 'Medium', 'Tatiao Road, Malaking Tatiao, Silang, Cavite, Calabarzon, 4118, Philippines', NULL, 'Pulong Bunga Road, Tubuan I, Balite I, Silang, Cavite, Calabarzon, 4118, Philippines', 'Pulong Bunga Road, Tubuan I, Balite I, Silang, Cavite, Calabarzon, 4118, Philippines', NULL, 14.20834827, 120.97509384, 14.22281520, 120.98590851, '2025-11-18 08:44:50', NULL, '242342', NULL, 0, 1, '2025-11-18 00:42:22', '2025-11-18 00:44:50', '2025-11-18 00:44:50'),
-(37, 'Accepted', 'jay', '242342', NULL, NULL, 'TRAINING', 'Medium', 'Tatiao Road, Malaking Tatiao, Silang, Cavite, Calabarzon, 4118, Philippines', NULL, 'Kapitan Sayas Street, Sabutan, Silang, Cavite, Calabarzon, 4118, Philippines', 'Kapitan Sayas Street, Sabutan, Silang, Cavite, Calabarzon, 4118, Philippines', NULL, 14.22945711, 120.97140312, 14.23461162, 120.98796844, '2025-11-21 14:19:52', 'Jay Mark', '242342', 1, 1, 1, '2025-11-21 06:19:22', '2025-11-21 06:19:52', NULL);
+(37, 'Completed', 'jay', '242342', NULL, NULL, 'TRAINING', 'Medium', 'Tatiao Road, Malaking Tatiao, Silang, Cavite, Calabarzon, 4118, Philippines', NULL, 'Kapitan Sayas Street, Sabutan, Silang, Cavite, Calabarzon, 4118, Philippines', 'Kapitan Sayas Street, Sabutan, Silang, Cavite, Calabarzon, 4118, Philippines', NULL, 14.22945711, 120.97140312, 14.23461162, 120.98796844, '2025-11-29 17:25:38', 'Jay Mark', '242342', 1, 1, 1, '2025-11-21 06:19:22', '2025-11-29 09:25:38', '2025-11-29 09:25:38'),
+(38, 'Completed', 'Juan Dela Cruz', '09123456789', 25, NULL, 'TR', 'Medium', 'Iba Road, Carranza Compound, San Miguel I, Malaking Tatiao, Silang, Cavite, Calabarzon, 4118, Philippines', NULL, 'Velazco Hospital, J. P. Rizal Street, Biga I, Silang, Cavite, Calabarzon, 4118, Philippines', 'Velazco Hospital, J. P. Rizal Street, Biga I, Silang, Cavite, Calabarzon, 4118, Philippines', NULL, 14.23451269, 120.97658515, 14.22707178, 120.97766876, '2025-12-03 02:57:12', NULL, '09123456789', NULL, 0, 1, '2025-11-25 00:51:53', '2025-12-02 18:57:12', '2025-12-02 18:57:12'),
+(39, 'Pending', 'qwe', 'qwe', 6, '2025-10-29', 'TR', 'Medium', 'Silang Specialists Medical Center, Aguinaldo Highway, San Miguel I, Silang, Cavite, Calabarzon, 4118, Philippines', NULL, 'Bayacal Street, San Vicente I, Malaking Tatiao, Silang, Cavite, Calabarzon, 4118, Philippines', 'Bayacal Street, San Vicente I, Malaking Tatiao, Silang, Cavite, Calabarzon, 4118, Philippines', NULL, 14.23404992, 120.98054409, 14.23461149, 120.97363472, '2025-11-27 14:27:42', NULL, 'qwe', NULL, 0, 1, '2025-11-27 06:27:42', '2025-11-27 06:27:42', NULL),
+(40, 'Completed', 'Juan Dela Cruz II', '09123456789', 5, NULL, 'ME', 'Medium', 'Langkaan Road, Langkaan 1, Langkaan, Dasmariñas, Cavite, Calabarzon, 4114, Philippines', NULL, 'Governor\'s Drive, Langkaan 2, Langkaan, Dasmariñas, Cavite, Calabarzon, 4114, Philippines', 'Governor\'s Drive, Langkaan 2, Langkaan, Dasmariñas, Cavite, Calabarzon, 4114, Philippines', NULL, 14.29265883, 120.93456030, 14.29100000, 120.94030000, '2025-11-29 11:19:37', NULL, '09123456789', NULL, 0, 1, '2025-11-29 03:19:20', '2025-11-29 03:19:37', '2025-11-29 03:19:37'),
+(41, 'Completed', 'Juan Dela Cruz', '09123456789', 5, NULL, 'VA', 'Medium', 'Langkaan Road, Langkaan 1, Langkaan, Dasmariñas, Cavite, Calabarzon, 4114, Philippines', NULL, 'M. H. del Pilar Street, Sabutan, Silang, Cavite, Calabarzon, 4118, Philippines', 'M. H. del Pilar Street, Sabutan, Silang, Cavite, Calabarzon, 4118, Philippines', NULL, 14.22793496, 120.97372055, 14.29100000, 120.94030000, '2025-11-29 13:41:36', NULL, '09123456789', NULL, 0, 1, '2025-11-29 05:41:18', '2025-11-29 05:41:36', '2025-11-29 05:41:36'),
+(42, 'Completed', 'Juan Dela Cruz', '09123456789', 5, NULL, 'VA', 'Medium', 'Langkaan Road, Langkaan 1, Langkaan, Dasmariñas, Cavite, Calabarzon, 4114, Philippines', NULL, 'M. H. del Pilar Street, Sabutan, Silang, Cavite, Calabarzon, 4118, Philippines', 'M. H. del Pilar Street, Sabutan, Silang, Cavite, Calabarzon, 4118, Philippines', NULL, 14.22795576, 120.97369909, 14.29100000, 120.94040000, '2025-12-01 08:20:36', NULL, '09123456789', NULL, 0, 1, '2025-11-30 04:53:16', '2025-12-01 00:20:36', '2025-12-01 00:20:36'),
+(43, 'Completed', 'Juan Dela Cruz', '09123456789', NULL, NULL, 'TR', 'Medium', 'Langkaan Road, Langkaan 1, Langkaan, Dasmariñas, Cavite, Calabarzon, 4114, Philippines', NULL, 'Velazco Hospital, J. P. Rizal Street, Biga I, Silang, Cavite, Calabarzon, 4118, Philippines', 'Velazco Hospital, J. P. Rizal Street, Biga I, Silang, Cavite, Calabarzon, 4118, Philippines', NULL, 14.23456989, 120.97663879, 14.29100000, 120.94040000, '2025-12-02 13:05:27', NULL, '09123456789', NULL, 0, 1, '2025-12-01 00:30:47', '2025-12-02 05:05:27', '2025-12-02 05:05:27'),
+(44, 'Completed', 'Pedro Pascal', '09123456789', NULL, NULL, 'ME', 'Medium', 'Langkaan Road, Langkaan 1, Langkaan, Dasmariñas, Cavite, Calabarzon, 4114, Philippines', NULL, 'Jetti, Governor\'s Drive, Langkaan 1, Langkaan, Dasmariñas, Cavite, Calabarzon, 4114, Philippines', 'Jetti, Governor\'s Drive, Langkaan 1, Langkaan, Dasmariñas, Cavite, Calabarzon, 4114, Philippines', NULL, 14.29360493, 120.93903422, 14.29100000, 120.94040000, '2025-12-02 13:05:34', NULL, '09123456789', NULL, 0, 1, '2025-12-01 05:16:40', '2025-12-02 05:05:34', '2025-12-02 05:05:34'),
+(46, 'Completed', 'Pedro Pascal', '09123456789', NULL, NULL, 'VA', 'Medium', 'Langkaan Road, Langkaan 1, Langkaan, Dasmariñas, Cavite, Calabarzon, 4114, Philippines', NULL, 'Cavite Doctor\'s Medical Center, De Fuego Link Road, De Fuego, San Francisco, General Trias, Cavite, Calabarzon, 4107, Philippines', 'Cavite Doctor\'s Medical Center, De Fuego Link Road, De Fuego, San Francisco, General Trias, Cavite, Calabarzon, 4107, Philippines', NULL, 14.29285117, 120.92861652, 14.29100000, 120.94030000, '2025-12-03 02:57:29', NULL, '09123456789', NULL, 0, 1, '2025-12-02 18:56:40', '2025-12-02 18:57:29', '2025-12-02 18:57:29');
 
 -- --------------------------------------------------------
 
@@ -285,7 +293,15 @@ INSERT INTO `case_ambulances` (`id`, `case_num`, `ambulance_id`, `driver_accepte
 (34, 34, 1, 1, 1, '2025-11-16 23:20:35', '2025-11-16 23:20:46', '2025-11-16 23:20:35', '2025-11-16 23:20:46'),
 (35, 35, 1, 1, 1, '2025-11-16 23:26:36', '2025-11-16 23:26:41', '2025-11-16 23:26:36', '2025-11-16 23:26:41'),
 (36, 36, 2, 0, 1, '2025-11-18 00:42:22', NULL, '2025-11-18 00:42:22', '2025-11-18 00:42:22'),
-(37, 37, 1, 1, 1, '2025-11-21 06:19:22', '2025-11-21 06:19:52', '2025-11-21 06:19:22', '2025-11-21 06:19:52');
+(37, 37, 1, 1, 1, '2025-11-21 06:19:22', '2025-11-21 06:19:52', '2025-11-21 06:19:22', '2025-11-21 06:19:52'),
+(38, 38, 3, 0, 1, '2025-11-25 00:51:53', NULL, '2025-11-25 00:51:53', '2025-11-25 00:51:53'),
+(39, 39, 1, 0, 1, '2025-11-27 06:27:42', NULL, '2025-11-27 06:27:42', '2025-11-27 06:27:42'),
+(40, 40, 1, 0, 1, '2025-11-29 03:19:20', NULL, '2025-11-29 03:19:20', '2025-11-29 03:19:20'),
+(41, 41, 1, 0, 1, '2025-11-29 05:41:18', NULL, '2025-11-29 05:41:18', '2025-11-29 05:41:18'),
+(42, 42, 1, 0, 1, '2025-11-30 04:53:16', NULL, '2025-11-30 04:53:16', '2025-11-30 04:53:16'),
+(43, 43, 1, 0, 1, '2025-12-01 00:30:47', NULL, '2025-12-01 00:30:47', '2025-12-01 00:30:47'),
+(44, 44, 1, 0, 1, '2025-12-01 05:16:40', NULL, '2025-12-01 05:16:40', '2025-12-01 05:16:40'),
+(46, 46, 1, 0, 1, '2025-12-02 18:56:40', NULL, '2025-12-02 18:56:40', '2025-12-02 18:56:40');
 
 -- --------------------------------------------------------
 
@@ -350,7 +366,7 @@ CREATE TABLE `drivers` (
   `remember_token` varchar(100) DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL
-) ;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `drivers`
@@ -718,7 +734,8 @@ INSERT INTO `users` (`id`, `name`, `email`, `email_verified_at`, `password`, `re
 (1, 'Prince', 'princenipaya@superadmin.com', NULL, '$2y$10$YBaJsFN41f5QwsQxK6PxQOcZRysYnmy1/zEx8IX07pLhJ4VktXMMi', NULL, NULL, NULL),
 (2, 'Ahlen', 'ahlencorpuz@superadmin.com', NULL, '$2y$10$wJz9xo25PEKuGaZdw4YOxeQCUL1tgJLqWbGDmzJqmxMwKbw8pG7m2', NULL, NULL, NULL),
 (3, 'admin', 'admin1@example.com', NULL, '$2y$10$Z.IkjdCAAqE4CLtABDY4uuAriB36Y4x01/OGVkmOO/bInkJ2yC1k6', 'Qi67ynxo5YOKmrpT8I5OVhkHgb9OuLWRW02ub57wsBW4mbir7oH8J5OBhUgJ', '2025-11-05 21:34:17', '2025-11-14 23:02:38'),
-(4, 'ahlen', 'ahlen@gmail.com', NULL, '$2y$10$hO.//Z0ONUK51hL3iaMiOeqmbe4FDILrM9wxPJu7PGZkUevfLJQA.', NULL, '2025-11-07 23:15:51', '2025-11-07 23:15:51');
+(4, 'ahlen', 'ahlen@gmail.com', NULL, '$2y$10$hO.//Z0ONUK51hL3iaMiOeqmbe4FDILrM9wxPJu7PGZkUevfLJQA.', NULL, '2025-11-07 23:15:51', '2025-11-07 23:15:51'),
+(5, 'admin9', 'admin@superadmin.com', NULL, '$2y$10$L4PPNA5ocJk5yDgC6xZW..AXnk1bLIhgFSn4yTD3otgdasd0iFUWC', NULL, '2025-11-25 00:28:31', '2025-11-25 00:28:31');
 
 --
 -- Indexes for dumped tables
@@ -961,13 +978,13 @@ ALTER TABLE `carousels`
 -- AUTO_INCREMENT for table `cases`
 --
 ALTER TABLE `cases`
-  MODIFY `case_num` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=38;
+  MODIFY `case_num` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=47;
 
 --
 -- AUTO_INCREMENT for table `case_ambulances`
 --
 ALTER TABLE `case_ambulances`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=38;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=47;
 
 --
 -- AUTO_INCREMENT for table `case_rejections`
@@ -985,7 +1002,7 @@ ALTER TABLE `dashboard_carousels`
 -- AUTO_INCREMENT for table `drivers`
 --
 ALTER TABLE `drivers`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `driver_ambulance_pairings`
@@ -1075,7 +1092,7 @@ ALTER TABLE `trainings`
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- Constraints for dumped tables

@@ -49,7 +49,7 @@ Route::get('/', function() {
         $controller = app()->make(DashboardController::class);
         return $controller->index();
     }
-    return 'MDRRMO Dashboard - System Online!';
+    return redirect()->route('login');
 })->name('home');
 
 Route::get('/test', function() {
@@ -641,6 +641,7 @@ Route::prefix('admin/pairing')->middleware(['auth'])->group(function () {
 Route::middleware(['auth'])->group(function () {
     Route::get('/admin/reported-cases', [ReportedCasesController::class, 'index'])
         ->name('reported-cases');
+    Route::post('/admin/reports/{id}/status', [ReportedCasesController::class, 'updateStatus'])->name('admin.reports.updateStatus');
 });
 Route::get('/reverse-geocode', function () {
     $lat = request('lat');

@@ -18,7 +18,7 @@ class PushController extends Controller
 
         // 1) Fetch token from Supabase users table via REST
         $supabaseUrl = rtrim(env('SUPABASE_URL'), '/');
-        $supabaseKey = env('SUPABASE_KEY');
+        $supabaseKey = env('SUPABASE_SERVICE_ROLE_KEY', env('SUPABASE_KEY'));
 
         try {
             // Query users table for expo_push_token

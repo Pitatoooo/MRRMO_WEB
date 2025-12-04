@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use App\Models\Report;
+use Illuminate\Validation\Rule;
 
 class ReportedCasesController extends Controller
 {
@@ -81,7 +83,7 @@ class ReportedCasesController extends Controller
         'latitude' => $finalLat,
         'longitude' => $finalLng,
         'location' => $finalAddress,
-        'status' => 'Pending',
+        'status' => 'PENDING',
         'created_at' => now(),
         'updated_at' => now(),
         'incident_datetime' => now(),
@@ -90,5 +92,18 @@ class ReportedCasesController extends Controller
     return response()->json(['success' => true, 'case_num' => $id]);
 }
 
+    public function updateStatus(Request $request, $id)
+    {
+        $request->validate([
+            'status' => ['required', Rule::in(['PENDING', 'ACKNOWLEDGED', 'ON_GOING', 'RESOLVED', 'DECLINED'])],
+        ]);
 
+        $report = DB::connection('supabase')->table('reports')->where('id', $id)->update(['status' => $request->status, 'updated_at' => now()]);
+
+        if (!$report) {
+            return back()->with('error', 'Report not found.');
+        }
+
+        return back()->with('success', "Status updated to {$request->status}");
+    }
 }
