@@ -120,9 +120,12 @@
                 <thead>
                     <tr>
                         <th>REPORTER</th>
-                        <th>CONTACT #</th> <th>TYPE</th>
+                        <th>CONTACT #</th> 
+                        <th>TYPE</th>
+                        <th>PATIENT STATUS</th> 
                         <th>LOCATION</th>
-                        <th>STATUS</th> <th>DATE</th>
+                        <th>STATUS</th> 
+                        <th>DATE</th>
                         <th>ACTIONS</th>
                     </tr>
                 </thead>
@@ -154,6 +157,12 @@
                         <td>{{ $case->contact_number ?? '—' }}</td>
 
                         <td><span style="background:#f3f4f6; padding:4px 8px; border-radius:6px; font-size:12px;">{{ $case->incident_type ?? '—' }}</span></td>
+
+                        <td>
+                            <span style="font-weight:600; color:#475569; background:#e2e8f0; padding:4px 8px; border-radius:6px; font-size:12px;">
+                                {{ $case->patient_status ?? 'N/A' }}
+                            </span>
+                        </td>
 
                         <td class="address-cell" data-lat="{{ $case->latitude }}" data-lng="{{ $case->longitude }}" title="{{ $case->location }}">
                             {{ Str::limit($case->location, 30) }}
@@ -603,50 +612,39 @@
                 actionsHtml += `<span style="font-size:12px; color:#16a34a; font-weight:600;">Case Resolved by User</span>`;
             }
 
-            row.innerHTML = `
-                <td style="font-weight:bold; color:#0b2a55;">${report.reporter_name || "Loading..."}</td>
-                <td>${report.contact_number || "Loading..."}</td>
-                <td><span style="background:#f3f4f6; padding:4px 8px; border-radius:6px; font-size:12px;">${report.incident_type || "—"}</span></td>
-                <td class="address-cell" data-lat="${report.latitude}" data-lng="${report.longitude}">${report.location || "Locating..."}</td>
-                <td><span class="status-badge" style="background-color:${statusColor}; color:white; padding:4px 8px; border-radius:6px; font-size:12px;">${status}</span></td>
-                <td style="font-size:12px; color:#64748b;">${dateStr}</td>
-                <td class="actions">
-                    ${actionsHtml}
-                </td>
-            `;
+        row.innerHTML = `
+    <td style="font-weight:bold; color:#0b2a55;">${report.reporter_name || "Loading..."}</td>
+    <td>${report.contact_number || "Loading..."}</td>
+    <td><span style="background:#f3f4f6; padding:4px 8px; border-radius:6px; font-size:12px;">${report.incident_type || "—"}</span></td>
+    
+    <td>
+        <span style="font-weight:600; color:#475569; background:#e2e8f0; padding:4px 8px; border-radius:6px; font-size:12px;">
+            ${report.patient_status || "N/A"}
+        </span>
+    </td>
+
+    <td class="address-cell" data-lat="${report.latitude}" data-lng="${report.longitude}">${report.location || "Locating..."}</td>
+    
+    <td>
+        <form action="/admin/reports/${report.id}/status" method="POST" class="status-form">
+            <input type="hidden" name="_token" value="${document.querySelector('meta[name="csrf-token"]').getAttribute('content')}"> 
+            <input type="hidden" name="status" value="${report.status || 'PENDING'}">
+            <span class="status-badge" style="background-color: ${statusColor}; color: white; border-radius: 6px; font-size: 12px; padding: 4px 8px; display: inline-block;">
+                ${(report.status || 'PENDING').replace('_', ' ')}
+            </span>
+        </form>
+    </td>
+    <td style="font-size:12px; color:#64748b;">${dateStr}</td>
+    <td class="actions">
+        ${actionsHtml}
+    </td>
+`;
 
             tableBody.prepend(row);
             processAddressCells([row.querySelector(".address-cell")]);
 
             return row; // Return the row so we can update it later
         }
-<<<<<<< Updated upstream
     });
-=======
-
-        const reportJson = encodeURIComponent(JSON.stringify(report));
-
-        row.innerHTML = `
-            <td style="font-weight:bold; color:#0b2a55;">${report.reporter_name || "Loading..."}</td>
-            <td>${report.contact_number || "Loading..."}</td>
-            <td><span style="background:#f3f4f6; padding:4px 8px; border-radius:6px; font-size:12px;">${report.incident_type || "—"}</span></td>
-            <td class="address-cell" data-lat="${report.latitude}" data-lng="${report.longitude}">${report.location || "Locating..."}</td>
-            <td><span class="status-badge" style="background:#d97706; color:white; padding:4px 8px; border-radius:6px; font-size:12px;">${report.patient_status || "Pending"}</span></td>
-            <td style="font-size:12px; color:#64748b;">${dateStr}</td>
-            <td class="actions">
-                <button class="btn-details" style="background:#64748b; color:white;" onclick="openModal(decodeURIComponent('${reportJson}'), '')">DETAILS</button>
-                ${btnHtml}
-            </td>
-        `;
-
-        tableBody.prepend(row);
-        processAddressCells([row.querySelector(".address-cell")]);
-
-        return row; // Return the row so we can update it later
-    }
-});
-
-
->>>>>>> Stashed changes
 </script>
 @endsection
