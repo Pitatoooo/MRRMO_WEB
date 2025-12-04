@@ -94,16 +94,51 @@ class ReportedCasesController extends Controller
 
     public function updateStatus(Request $request, $id)
     {
+        // Admins may only move a report forward in the workflow:
+        // PENDING -> ACKNOWLEDGED -> ON_GOING
+        // They cannot set RESOLVED or DECLINED directly.
         $request->validate([
-            'status' => ['required', Rule::in(['PENDING', 'ACKNOWLEDGED', 'ON_GOING', 'RESOLVED', 'DECLINED'])],
+            'status' => ['required', Rule::in(['ACKNOWLEDGED', 'ON_GOING'])],
         ]);
 
-        $report = DB::connection('supabase')->table('reports')->where('id', $id)->update(['status' => $request->status, 'updated_at' => now()]);
+        // Fetch current report status from Supabase
+        $report = DB::connection('supabase')
+            ->table('reports')
+            ->where('id', $id)
+            ->first();
 
         if (!$report) {
             return back()->with('error', 'Report not found.');
         }
 
-        return back()->with('success', "Status updated to {$request->status}");
+        $currentStatus = $report->status ?? 'PENDING';
+        $targetStatus = $request->status;
+
+        $isValid = false;
+
+        // Enforce one-way transitions: PENDING -> ACKNOWLEDGED -> ON_GOING
+        if ($currentStatus === 'PENDING' && $targetStatus === 'ACKNOWLEDGED') {
+            $isValid = true;
+        } elseif ($currentStatus === 'ACKNOWLEDGED' && $targetStatus === 'ON_GOING') {
+            $isValid = true;
+        }
+
+        if (!$isValid) {
+            return back()->with('error', 'Invalid status transition.');
+        }
+
+        $updated = DB::connection('supabase')
+            ->table('reports')
+            ->where('id', $id)
+            ->update([
+                'status'     => $targetStatus,
+                'updated_at' => now(),
+            ]);
+
+        if (!$updated) {
+            return back()->with('error', 'Failed to update report status.');
+        }
+
+        return back()->with('success', "Status updated to {$targetStatus}");
     }
 }

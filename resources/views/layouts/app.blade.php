@@ -62,16 +62,18 @@ svg { max-width: 30px; height: auto; }
 
 <script>
   // SINGLE Supabase client (avoid multiple instances)
-  if (!window.supabaseClient) {
+  let supabaseClient = window.supabaseClient || null;
+  if (!supabaseClient && typeof supabase !== 'undefined') {
     const SUPABASE_URL = "https://bhcecrbyknorjzkjazxu.supabase.co";
     const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJoY2VjcmJ5a25vcmp6a2phenh1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTkyMDYwNDMsImV4cCI6MjA3NDc4MjA0M30.Nfv0vHVk1IyN1gz1Y4mdogL9ChsV0DkiMQivuYnolt4";
-    window.supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    window.supabaseClient = supabaseClient;
   }
-  const supabaseClient = window.supabaseClient;
 
   let unread = 0;
 
   // Real-time listener
+if (supabaseClient) {
 const reportsChannel = supabaseClient
   .channel('public:reports') // channel name, can be anything
   .on(
@@ -131,6 +133,7 @@ if (audio) {
     }
   )
   .subscribe();
+}
 
 
   function toggleNotif() {

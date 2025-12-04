@@ -128,7 +128,8 @@
                 </thead>
                 <tbody>
                     @forelse($cases as $case)
-                    <tr data-id="{{ $case->id }}">
+                    <tr data-id="{{ $case->id }}" data-user-id="{{ $case->user_id }}">
+
                         @php
                             $images = $case->uploaded_media;
                             if (is_string($images)) {
@@ -136,7 +137,7 @@
                                 $images = explode(',', $images);
                             }
                             $firstImage = is_array($images) && count($images) > 0 ? $images[0] : '';
-                            
+
                             // Determine status color
                             $statusColor = match($case->status ?? 'PENDING') {
                                 'PENDING' => '#d97706',      // Orange
@@ -149,11 +150,11 @@
                         @endphp
 
                         <td style="font-weight:bold; color:#0b2a55;">{{ $case->reporter_name ?? 'Guest/Unknown' }}</td>
-                        
+
                         <td>{{ $case->contact_number ?? '—' }}</td>
 
                         <td><span style="background:#f3f4f6; padding:4px 8px; border-radius:6px; font-size:12px;">{{ $case->incident_type ?? '—' }}</span></td>
-                        
+
                         <td class="address-cell" data-lat="{{ $case->latitude }}" data-lng="{{ $case->longitude }}" title="{{ $case->location }}">
                             {{ Str::limit($case->location, 30) }}
                         </td>
@@ -161,17 +162,14 @@
                         <td>
                             <form action="{{ route('admin.reports.updateStatus', $case->id) }}" method="POST" class="status-form">
                                 @csrf
-                                <select name="status" class="status-dropdown" onchange="this.form.submit()" style="background-color: {{ $statusColor }}; color: white; border-radius: 6px; font-size: 12px; padding: 4px 8px; border: none;">
-                                    @foreach(['PENDING', 'ACKNOWLEDGED', 'ON_GOING', 'RESOLVED', 'DECLINED'] as $status)
-                                        <option value="{{ $status }}" {{ ($case->status ?? 'PENDING') == $status ? 'selected' : '' }} style="background-color: #fff; color: #000;">
-                                            {{ ucfirst(strtolower(str_replace('_', ' ', $status))) }}
-                                        </option>
-                                    @endforeach
-                                </select>
+                                <input type="hidden" name="status" value="{{ $case->status ?? 'PENDING' }}">
+                                <span class="status-badge" style="background-color: {{ $statusColor }}; color: white; border-radius: 6px; font-size: 12px; padding: 4px 8px; display: inline-block;">
+                                    {{ ucfirst(strtolower(str_replace('_', ' ', $case->status ?? 'PENDING'))) }}
+                                </span>
                             </form>
                         </td>
                         <td style="font-size:12px; color:#64748b;">{{ \Carbon\Carbon::parse($case->incident_datetime)->setTimezone('Asia/Manila')->format('M d, Y h:i A') }}</td>
-                        
+
                         <td class="actions">
                             <button class="btn-details" 
                                 style="background:#64748b; color:white;" 
@@ -181,21 +179,43 @@
                                 DETAILS
                             </button>
 
-                            <button class="btn-details"><a href="{{ url('/admin/gps') }}?lat={{ $case->latitude }}&lng={{ $case->longitude }}&location={{ urlencode($case->location) }}&name={{ urlencode($case->reporter_name) }}&contact={{ urlencode($case->contact_number ?? '') }}" 
-                                class="btn-icon" 
-                                style="color:black; text-decoration:none;"
-                                title="Pin on Map"> PIN ON MAP 
-                            </a>
-
-                            @if(($case->patient_status ?? 'Pending') !== 'Accepted')
-                            <button class="btn-accept" 
-                                style="background:#22c55e; color:white;" 
-                                title="Accept & Notify"
-                                onclick="acceptReport('{{ $case->id }}')">
-                                ACCEPT
+                            <button class="btn-details">
+                                <a href="{{ url('/admin/gps') }}?lat={{ $case->latitude }}&lng={{ $case->longitude }}&location={{ urlencode($case->location) }}&name={{ urlencode($case->reporter_name) }}&contact={{ urlencode($case->contact_number ?? '') }}" 
+                                    class="btn-icon" 
+                                    style="color:black; text-decoration:none;"
+                                    title="Pin on Map">
+                                    PIN ON MAP 
+                                </a>
                             </button>
+
+                            @php $workflowStatus = $case->status ?? 'PENDING'; @endphp
+                            @if($workflowStatus === 'PENDING')
+                                <button type="button"
+                                    class="btn-accept" 
+                                    style="background:#22c55e; color:white;" 
+                                    title="Accept Report"
+                                    onclick="handleStatusAction('{{ $case->id }}', 'ACKNOWLEDGED')">
+                                    Accept Report
+                                </button>
+                            @elseif($workflowStatus === 'ACKNOWLEDGED')
+                                <button type="button"
+                                    class="btn-dispatch" 
+                                    style="background:#2563eb; color:white;" 
+                                    title="Dispatch Team"
+                                    onclick="handleStatusAction('{{ $case->id }}', 'ON_GOING')">
+                                    Dispatch Team
+                                </button>
+                            @elseif($workflowStatus === 'ON_GOING')
+                                <span style="font-size:12px; color:#64748b; font-style:italic;">
+                                    Waiting for user resolution...
+                                </span>
+                            @elseif($workflowStatus === 'RESOLVED')
+                                <span style="font-size:12px; color:#16a34a; font-weight:600;">
+                                    Case Resolved by User
+                                </span>
                             @endif
                         </td>
+
                     </tr>
                     @empty
                     <tr><td colspan="7" style="text-align:center; padding:30px; color:#94a3b8;">No reported cases found.</td></tr>
@@ -238,75 +258,85 @@
 
 <div id="liveStatus">CONNECTING...</div>
 
+<div id="resolvedModal" class="modal-overlay">
+    <div class="modal-box">
+        <div class="modal-header">
+            <h3>Report Resolved</h3>
+            <button class="modal-close" onclick="closeResolvedModal()">&times;</button>
+        </div>
+        <div class="modal-body">
+            <p id="resolvedModalMessage" style="margin: 0; color: #334155; font-weight: 500;"></p>
+        </div>
+        <div class="modal-actions">
+            <button onclick="closeResolvedModal()" style="padding:10px 18px; border-radius:8px; background:#2563eb; color:white; font-weight:600; border:none; cursor:pointer;">
+                Acknowledge &amp; Close
+            </button>
+        </div>
+    </div>
+</div>
+
 <script>
-    // --- 1. ACCEPT REPORT FUNCTION (CORRECTED) ---
-    async function acceptReport(reportId) {
-        if (!confirm("Are you sure you want to ACCEPT this report?")) return;
+    let currentReportId = null;
 
-        // 1. Fetch the correct user_id from the 'reports' table.
-        const { data: reportData, error: fetchError } = await supabaseClient
-            .from('reports')
-            .select('user_id')
-            .eq('id', reportId)
-            .single();
+    // --- 1. STRICT STATUS ACTION HANDLER ---
+    async function handleStatusAction(reportId, newStatus) {
+        const row = document.querySelector(`tr[data-id="${reportId}"]`);
+        if (!row) return;
 
-        if (fetchError || !reportData) {
-            alert("Error fetching report details: " + (fetchError?.message || 'Report not found'));
-            return;
-        }
-        const userId = reportData.user_id;
+        const confirmMessage = newStatus === 'ACKNOWLEDGED'
+            ? 'Are you sure you want to ACCEPT this report?'
+            : 'Are you sure you want to DISPATCH a team for this report?';
 
-        // 2. Update the report status in Supabase.
-        const { error: updateError } = await supabaseClient
-            .from('reports')
-            .update({ status: 'ACKNOWLEDGED' })
-            .eq('id', reportId);
+        if (!confirm(confirmMessage)) return;
 
-        if (updateError) {
-            alert("Error updating report status: " + updateError.message);
-            return;
-        }
-
-        // 3. Send the push notification via the backend.
         try {
-            const res = await fetch("/api/send-push", {
-                method: "POST",
+            const response = await fetch(`/admin/reports/${reportId}/status`, {
+                method: 'POST',
                 headers: {
-                    "Content-Type": "application/json",
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
                 },
-                body: JSON.stringify({ user_id: userId, report_id: reportId })
+                body: JSON.stringify({ status: newStatus }),
             });
 
-            const data = await res.json();
-
-            if (data.success) {
-                alert("✅ Report accepted and notification sent!");
-            } else {
-                alert("⚠️ Report accepted but push failed: " + data.error);
+            if (!response.ok) {
+                const text = await response.text();
+                console.error('Status update failed:', text);
+                alert('Failed to update status. Please refresh and try again.');
+                return;
             }
-        } catch (err) {
-            console.error('Push notification failed:', err);
-            alert("⚠️ Failed to send push notification. See console for details.");
-        }
 
-        // 4. Update the UI to reflect the change.
-        const row = document.querySelector(`tr[data-id="${reportId}"]`);
-        if (row) {
-            const statusDropdown = row.querySelector('.status-dropdown');
-            if (statusDropdown) {
-                statusDropdown.value = 'ACKNOWLEDGED';
-                statusDropdown.style.backgroundColor = '#2563eb'; // Blue for ACKNOWLEDGED
+            // Optionally send push notification when report is accepted
+            if (newStatus === 'ACKNOWLEDGED') {
+                const userId = row.getAttribute('data-user-id');
+                if (userId) {
+                    try {
+                        await fetch('/api/send-push', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                            },
+                            body: JSON.stringify({ user_id: userId, report_id: reportId }),
+                        });
+                    } catch (err) {
+                        console.error('Push notification failed:', err);
+                    }
+                }
             }
-            const btn = row.querySelector('.btn-accept');
-            if (btn) btn.remove();
+
+            // Reload the page so badges and actions reflect the new status
+            window.location.reload();
+        } catch (error) {
+            console.error('Error updating report status:', error);
+            alert('An unexpected error occurred while updating status.');
         }
     }
 
     // --- 2. ADDRESS PROCESSING ---
     document.addEventListener("DOMContentLoaded", function() {
         processAddressCells(document.querySelectorAll('.address-cell'));
-        
+
         // Setup Live Status
         const statusBadge = document.getElementById("liveStatus");
         window.addEventListener("online", () => { statusBadge.innerText = "ONLINE"; statusBadge.style.background = "green"; });
@@ -316,7 +346,7 @@
     async function processAddressCells(cells) {
         for (const cell of cells) {
             if (cell.dataset.processed) continue;
-            
+
             const lat = cell.getAttribute('data-lat');
             const lng = cell.getAttribute('data-lng');
             const currentText = cell.innerText.trim();
@@ -343,18 +373,22 @@
     async function openModal(caseJson, firstImage) {
         const data = typeof caseJson === 'string' ? JSON.parse(caseJson) : caseJson;
 
+        currentReportId = data.id || null;
+
         document.getElementById('m_reporter').innerText = data.reporter_name || 'Guest';
+
         document.getElementById('m_type').innerText = data.incident_type || 'N/A';
         document.getElementById('m_patient_status').innerText = data.status || 'Pending';
         document.getElementById('m_description').innerText = data.description || 'No description.';
-        
+
         const dateObj = new Date(data.incident_datetime || data.created_at);
+
         document.getElementById('m_time').innerText = dateObj.toLocaleString();
 
         // Location Logic
         const locationEl = document.getElementById('m_location');
         locationEl.innerText = data.location || `${data.latitude}, ${data.longitude}`;
-        
+
         if (data.latitude && data.longitude) {
             try {
                 const url = `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${data.latitude}&lon=${data.longitude}`;
@@ -372,10 +406,10 @@
         const imgContainer = document.getElementById('m_image_container');
         const img = document.getElementById('m_image');
         const link = document.getElementById('m_image_link');
-        
+
         // Handle image passed from blade or extracted from JSON
         let mediaUrl = firstImage; 
-        
+
         // If passed as empty string, try parsing from JSON
         if (!mediaUrl && data.uploaded_media) {
              let mediaArray = data.uploaded_media;
@@ -400,20 +434,38 @@
 
     function closeModal() {
         document.getElementById('caseModal').style.display = 'none';
+        currentReportId = null;
     }
-    
+
+    function closeResolvedModal() {
+        const el = document.getElementById('resolvedModal');
+        if (el) el.style.display = 'none';
+    }
+
     window.onclick = function(event) {
         if (event.target == document.getElementById('caseModal')) closeModal();
     };
 
     document.addEventListener("DOMContentLoaded", () => {
+
     const tableBody = document.querySelector("#reports-table tbody");
+
     const notifySound = new Audio("https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3");
     notifySound.loop = true;
 
     let audioUnlocked = true; // Already working
 
-    // --- Realtime listener ---
+    const supabaseClient = window.supabaseClient || null;
+    if (!supabaseClient) {
+        const el = document.getElementById("liveStatus");
+        if (el) {
+            el.innerText = "REALTIME DISCONNECTED";
+            el.style.background = "gray";
+        }
+        return;
+    }
+
+    // --- Realtime listener for new reports ---
     supabaseClient
         .channel("reports-live")
         .on(
@@ -467,43 +519,103 @@
             }
         });
 
+        // --- Realtime listener for RESOLVED status on the currently viewed report ---
+        supabaseClient
+            .channel("reports-resolved")
+            .on(
+                "postgres_changes",
+                { event: "UPDATE", schema: "public", table: "reports" },
+                (payload) => {
+                    if (!payload.new || !payload.old) return;
+                    if (payload.old.status === 'RESOLVED') return;
+                    if (payload.new.status !== 'RESOLVED') return;
+
+                    if (!currentReportId || String(payload.new.id) !== String(currentReportId)) {
+                        return;
+                    }
+
+                    const modal = document.getElementById('resolvedModal');
+                    const msgEl = document.getElementById('resolvedModalMessage');
+                    if (msgEl) {
+                        msgEl.textContent = `Report #${payload.new.id} has been marked as RESOLVED by the citizen.`;
+                    }
+                    if (modal) {
+                        modal.style.display = 'flex';
+                    }
+                }
+            )
+            .subscribe();
+
         // --- Add new row function ---
         function addNewRow(report) {
-        // Prevent duplicate row
-        if (document.querySelector(`tr[data-id="${report.id}"]`)) return null;
+            // Prevent duplicate row
+            if (document.querySelector(`tr[data-id="${report.id}"]`)) return null;
 
-        const row = document.createElement("tr");
-        row.setAttribute("data-id", report.id);
-        row.style.animation = "highlightNew 2s ease-out";
+            const row = document.createElement("tr");
+            row.setAttribute("data-id", report.id);
+            if (report.user_id) {
+                row.setAttribute("data-user-id", report.user_id);
+            }
+            row.style.animation = "highlightNew 2s ease-out";
 
-        const dateStr = new Date(report.created_at).toLocaleString();
+            const dateStr = new Date(report.incident_datetime || report.created_at).toLocaleString();
+            const status = report.status || 'PENDING';
 
-        let btnHtml = "";
-        if (report.patient_status !== "Accepted") {
-            btnHtml = `<button class="btn-accept" style="background:#22c55e; color:white;" title="Accept" onclick="acceptReport('${report.id}')">ACCEPT</button>`;
+            let statusColor;
+            switch (status) {
+                case 'PENDING':
+                    statusColor = '#d97706';
+                    break;
+                case 'ACKNOWLEDGED':
+                    statusColor = '#2563eb';
+                    break;
+                case 'ON_GOING':
+                    statusColor = '#ca8a04';
+                    break;
+                case 'RESOLVED':
+                    statusColor = '#16a34a';
+                    break;
+                case 'DECLINED':
+                    statusColor = '#dc2626';
+                    break;
+                default:
+                    statusColor = '#64748b';
+            }
+
+            const reportJson = encodeURIComponent(JSON.stringify(report));
+
+            let actionsHtml = `
+                    <button class="btn-details" style="background:#64748b; color:white;" onclick="openModal(decodeURIComponent('${reportJson}'), '')">DETAILS</button>
+                    <button class="btn-details"><a href="/admin/gps?lat=${report.latitude}&lng=${report.longitude}" class="btn-icon" style="color:black; text-decoration:none;">PIN ON MAP</a></button>
+            `;
+
+            if (status === 'PENDING') {
+                actionsHtml += `<button type="button" class="btn-accept" style="background:#22c55e; color:white;" title="Accept Report" onclick="handleStatusAction('${report.id}', 'ACKNOWLEDGED')">Accept Report</button>`;
+            } else if (status === 'ACKNOWLEDGED') {
+                actionsHtml += `<button type="button" class="btn-dispatch" style="background:#2563eb; color:white;" title="Dispatch Team" onclick="handleStatusAction('${report.id}', 'ON_GOING')">Dispatch Team</button>`;
+            } else if (status === 'ON_GOING') {
+                actionsHtml += `<span style="font-size:12px; color:#64748b; font-style:italic;">Waiting for user resolution...</span>`;
+            } else if (status === 'RESOLVED') {
+                actionsHtml += `<span style="font-size:12px; color:#16a34a; font-weight:600;">Case Resolved by User</span>`;
+            }
+
+            row.innerHTML = `
+                <td style="font-weight:bold; color:#0b2a55;">${report.reporter_name || "Loading..."}</td>
+                <td>${report.contact_number || "Loading..."}</td>
+                <td><span style="background:#f3f4f6; padding:4px 8px; border-radius:6px; font-size:12px;">${report.incident_type || "—"}</span></td>
+                <td class="address-cell" data-lat="${report.latitude}" data-lng="${report.longitude}">${report.location || "Locating..."}</td>
+                <td><span class="status-badge" style="background-color:${statusColor}; color:white; padding:4px 8px; border-radius:6px; font-size:12px;">${status}</span></td>
+                <td style="font-size:12px; color:#64748b;">${dateStr}</td>
+                <td class="actions">
+                    ${actionsHtml}
+                </td>
+            `;
+
+            tableBody.prepend(row);
+            processAddressCells([row.querySelector(".address-cell")]);
+
+            return row; // Return the row so we can update it later
         }
-
-        const reportJson = encodeURIComponent(JSON.stringify(report));
-
-        row.innerHTML = `
-            <td style="font-weight:bold; color:#0b2a55;">${report.reporter_name || "Loading..."}</td>
-            <td>${report.contact_number || "Loading..."}</td>
-            <td><span style="background:#f3f4f6; padding:4px 8px; border-radius:6px; font-size:12px;">${report.incident_type || "—"}</span></td>
-            <td class="address-cell" data-lat="${report.latitude}" data-lng="${report.longitude}">${report.location || "Locating..."}</td>
-            <td><span class="status-badge" style="background:#d97706; color:white; padding:4px 8px; border-radius:6px; font-size:12px;">${report.patient_status || "Pending"}</span></td>
-            <td style="font-size:12px; color:#64748b;">${dateStr}</td>
-            <td class="actions">
-                <button class="btn-details" style="background:#64748b; color:white;" onclick="openModal(decodeURIComponent('${reportJson}'), '')">DETAILS</button>
-                <button class="btn-details"><a href="/admin/gps?lat=${report.latitude}&lng=${report.longitude}" class="btn-icon" style="color:black; text-decoration:none;">PIN ON MAP</a></button>
-                ${btnHtml}
-            </td>
-        `;
-
-        tableBody.prepend(row);
-        processAddressCells([row.querySelector(".address-cell")]);
-
-        return row; // Return the row so we can update it later
-    }
-});
+    });
 </script>
 @endsection
