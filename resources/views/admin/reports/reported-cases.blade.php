@@ -532,7 +532,7 @@
             }
         });
 
-        // --- Realtime listener for RESOLVED status on the currently viewed report ---
+        // --- Realtime listener for RESOLVED status updates (table + modal) ---
         supabaseClient
             .channel("reports-resolved")
             .on(
@@ -540,17 +540,46 @@
                 { event: "UPDATE", schema: "public", table: "reports" },
                 (payload) => {
                     if (!payload.new || !payload.old) return;
-                    if (payload.old.status === 'RESOLVED') return;
-                    if (payload.new.status !== 'RESOLVED') return;
 
-                    if (!currentReportId || String(payload.new.id) !== String(currentReportId)) {
+                    const report = payload.new;
+                    const previous = payload.old;
+
+                    // Only react when a report transitions into RESOLVED
+                    if (previous.status === 'RESOLVED') return;
+                    if (report.status !== 'RESOLVED') return;
+
+                    // 1) Update the table row in place, if it exists on this page
+                    const row = document.querySelector(`tr[data-id="${report.id}"]`);
+                    if (row) {
+                        // Update hidden status input, if present
+                        const statusInput = row.querySelector('input[name="status"]');
+                        if (statusInput) {
+                            statusInput.value = 'RESOLVED';
+                        }
+
+                        // Update status badge to green "Resolved"
+                        const statusBadge = row.querySelector('.status-badge');
+                        if (statusBadge) {
+                            statusBadge.style.backgroundColor = '#16a34a';
+                            statusBadge.textContent = 'Resolved';
+                        }
+
+                        // Update actions cell to show resolved text
+                        const actionsCell = row.querySelector('.actions');
+                        if (actionsCell) {
+                            actionsCell.innerHTML = '<span style="font-size:12px; color:#16a34a; font-weight:600;">Case Resolved by User</span>';
+                        }
+                    }
+
+                    // 2) If this report is currently open in the details modal, show the resolved modal
+                    if (!currentReportId || String(report.id) !== String(currentReportId)) {
                         return;
                     }
 
                     const modal = document.getElementById('resolvedModal');
                     const msgEl = document.getElementById('resolvedModalMessage');
                     if (msgEl) {
-                        msgEl.textContent = `Report #${payload.new.id} has been marked as RESOLVED by the citizen.`;
+                        msgEl.textContent = `Report #${report.id} has been marked as RESOLVED by the citizen.`;
                     }
                     if (modal) {
                         modal.style.display = 'flex';
