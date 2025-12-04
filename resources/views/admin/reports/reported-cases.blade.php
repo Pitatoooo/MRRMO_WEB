@@ -494,15 +494,19 @@
                         report.contact_number = "—";
                         console.error("Error fetching user via RPC:", err);
                     }
-                } else {
-                    report.reporter_name = "Guest";
-                    report.contact_number = "—";
                 }
 
-                // Update the existing row with reporter info
+                // --- Update row cells ---
                 if (row) {
                     row.querySelector("td:nth-child(1)").innerText = report.reporter_name;
                     row.querySelector("td:nth-child(2)").innerText = report.contact_number;
+
+                    // Update DETAILS button with correct report object
+                    const reportJson = encodeURIComponent(JSON.stringify(report));
+                    const detailsBtn = row.querySelector(".btn-details");
+                    if (detailsBtn) {
+                        detailsBtn.setAttribute("onclick", `openModal(decodeURIComponent('${reportJson}'), '')`);
+                    }
                 }
 
                 // Play notification sound
@@ -616,6 +620,33 @@
 
             return row; // Return the row so we can update it later
         }
+<<<<<<< Updated upstream
     });
+=======
+
+        const reportJson = encodeURIComponent(JSON.stringify(report));
+
+        row.innerHTML = `
+            <td style="font-weight:bold; color:#0b2a55;">${report.reporter_name || "Loading..."}</td>
+            <td>${report.contact_number || "Loading..."}</td>
+            <td><span style="background:#f3f4f6; padding:4px 8px; border-radius:6px; font-size:12px;">${report.incident_type || "—"}</span></td>
+            <td class="address-cell" data-lat="${report.latitude}" data-lng="${report.longitude}">${report.location || "Locating..."}</td>
+            <td><span class="status-badge" style="background:#d97706; color:white; padding:4px 8px; border-radius:6px; font-size:12px;">${report.patient_status || "Pending"}</span></td>
+            <td style="font-size:12px; color:#64748b;">${dateStr}</td>
+            <td class="actions">
+                <button class="btn-details" style="background:#64748b; color:white;" onclick="openModal(decodeURIComponent('${reportJson}'), '')">DETAILS</button>
+                ${btnHtml}
+            </td>
+        `;
+
+        tableBody.prepend(row);
+        processAddressCells([row.querySelector(".address-cell")]);
+
+        return row; // Return the row so we can update it later
+    }
+});
+
+
+>>>>>>> Stashed changes
 </script>
 @endsection
