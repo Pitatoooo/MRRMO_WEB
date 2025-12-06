@@ -206,6 +206,7 @@
                                     onclick="handleStatusAction('{{ $case->id }}', 'ACKNOWLEDGED')">
                                     Accept Report
                                 </button>
+                                
                             @elseif($workflowStatus === 'ACKNOWLEDGED')
                                 <button type="button"
                                     class="btn-dispatch" 
@@ -220,7 +221,7 @@
                                 </span>
                             @elseif($workflowStatus === 'RESOLVED')
                                 <span style="font-size:12px; color:#16a34a; font-weight:600;">
-                                    Case Resolved by User
+                                    Case Resolved!
                                 </span>
                             @endif
                         </td>
@@ -245,8 +246,10 @@
         </div>
         <div class="modal-body">
             <div class="detail-row"><span class="detail-label">Reporter</span><span class="detail-value" id="m_reporter"></span></div>
+            <div class="detail-row"><span class="detail-label">Contact No.</span><span class="detail-value" id="m_contact_number"></span></div>
             <div class="detail-row"><span class="detail-label">Incident Type</span><span class="detail-value" id="m_type"></span></div>
-            <div class="detail-row"><span class="detail-label">Status</span><span class="detail-value" id="m_patient_status"></span></div>
+            <div class="detail-row"><span class="detail-label">Patient Status</span><span class="detail-value" id="m_patient_status"></span></div>
+            <div class="detail-row"><span class="detail-label">Status</span><span class="detail-value" id="m_status"></span></div>
             <div class="detail-row"><span class="detail-label">Location</span><span class="detail-value" id="m_location"></span></div>
             <div class="detail-row"><span class="detail-label">Description</span><span class="detail-value" id="m_description" style="font-style:italic;"></span></div>
             <div class="detail-row" style="border:none;"><span class="detail-label">Time Reported</span><span class="detail-value" id="m_time"></span></div>
@@ -259,8 +262,12 @@
             </div>
         </div>
         <div class="modal-actions">
-            <button onclick="closeModal()" style="padding:10px 18px; border:1px solid #cbd5e1; border-radius:8px; background:red; font-weight:600; cursor:pointer;">Close</button>
-            <a id="m_map_link" href="#" style="padding:10px 18px; border-radius:8px; background:#2563eb; color:white; font-weight:600; text-decoration:none; display:inline-block;">Pin on Map</a>
+            <!-- ADDED: Print button -->
+            <button onclick="printReportDetails()" style="padding:10px 18px; border-radius:8px; background:#0b2a55; color:white; font-weight:600; border:none; cursor:pointer; margin-right:auto;">
+                🖨️ Print
+            </button>
+            
+            <button onclick="closeModal()" style="padding:10px 18px; border:1px solid #cbd5e1; border-radius:8px; background:#64748b; color:white; font-weight:600; cursor:pointer;">Close</button>
         </div>
     </div>
 </div>
@@ -286,6 +293,100 @@
 
 <script>
     let currentReportId = null;
+
+    // --- 0. PRINT FUNCTION (ADDED) ---
+    function printReportDetails() {
+        const reporterName = document.getElementById('m_reporter').innerText;
+        const contactNumber = document.getElementById('m_contact_number').innerText;
+        const incidentType = document.getElementById('m_type').innerText;
+        const patientStatus = document.getElementById('m_patient_status').innerText;
+        const status = document.getElementById('m_status').innerText;
+        const location = document.getElementById('m_location').innerText;
+        const description = document.getElementById('m_description').innerText;
+        const timeReported = document.getElementById('m_time').innerText;
+        const imageElement = document.getElementById('m_image');
+
+        let printWindow = window.open('', '', 'height=600,width=800');
+        printWindow.document.write(`
+            <html>
+            <head>
+                <title style="text-align: right">Report Details</title>
+                <style>
+                    body { font-family: Arial, sans-serif; margin: 20px; background: white; }
+                    .print-header { text-align: center; margin-bottom: 30px; border-bottom: 2px solid #0b2a55; padding-bottom: 15px; }
+                    .print-header h1 { color: #0b2a55; margin: 0; }
+                    .print-section { margin-bottom: 15px; }
+                    .print-label { font-weight: bold; color: #0b2a55; }
+                    .print-value { color: #334155; margin-top: 5px; }
+                    .print-image { max-width: 400px; margin-top: 20px; border: 1px solid #ddd; }
+                </style>
+            </head>
+            <body>
+                <div class="print-header">
+                    <h1>Incident Report Details</h1>
+                </div>
+                <div>
+                <table class="print-table" style="width:100%; margin-bottom:20px; border-collapse:collapse;">
+                    <tr>
+                        <th style="color: blue;">Reporter: </th>
+                        <td style="text-decoration: underline;"> ${reporterName}</td>
+        
+                        <th style="color: blue;">Contact No.: </th>
+                        <td style="text-decoration: underline;"> ${contactNumber}</td>
+        
+                        <th style="color: blue;">Incident Type: </th>
+                        <td style="text-decoration: underline;"> ${incidentType}</td>
+                    </tr>
+                </table>
+                </div>
+                <div>
+                <table class="print-table" style="margin-bottom:20px;">
+                    <tr>
+                        <th style="color: blue;">Patient Status: </th>
+                        <td>${patientStatus}</td>
+                        <th style="color: blue;">Status: </th>
+                        <td>${status}</td>
+                    </tr>
+                </table>
+                </div>
+                <div>
+                <table class="print-table" style="margin-bottom:20px;">
+                    <tr>
+                        <th style="color: blue;">Description: </th>
+                        <td>${description}</td>
+                    </tr>
+                </table>
+                </div>
+                <div>
+                <table class="print-table" style="margin-bottom:20px;">
+                    <tr>
+                        <th style="color: blue;">Location: </th>
+                        <td>${location}</td>
+                    </tr>
+                </table>
+                </div>
+                <table class="print-table" style="margin-bottom:20px;">
+                    <tr>
+                        <th style="color: blue;">Time Reported: </th>
+                        <td>${timeReported}</td>
+                    </tr>
+                </table>
+                </div>
+                ${imageElement && imageElement.src ? `
+                        <div style="text-align:center; margin-top:15px;">
+                            <div style="font-weight:600; margin-bottom:8px; color: blue;">Evidence Photo</div>
+                            <img src="${imageElement.src}" class="print-image" alt="Evidence Photo" style="display:inline-block;">
+                        </div>
+                    ` : ''}
+                <script>
+                    window.print();
+                    window.close();
+                <\/script>
+            </body>
+            </html>
+        `);
+        printWindow.document.close();
+    }
 
     // --- 1. STRICT STATUS ACTION HANDLER ---
     async function handleStatusAction(reportId, newStatus) {
@@ -385,9 +486,10 @@
         currentReportId = data.id || null;
 
         document.getElementById('m_reporter').innerText = data.reporter_name || 'Guest';
-
+        document.getElementById('m_contact_number').innerText = data.contact_number || 'N/A';
         document.getElementById('m_type').innerText = data.incident_type || 'N/A';
-        document.getElementById('m_patient_status').innerText = data.status || 'Pending';
+        document.getElementById('m_status').innerText = data.status || 'Pending';
+        document.getElementById('m_patient_status').innerText = data.patient_status || 'Pending';
         document.getElementById('m_description').innerText = data.description || 'No description.';
 
         const dateObj = new Date(data.incident_datetime || data.created_at);
@@ -407,9 +509,6 @@
             } catch (e) { console.warn("Modal Address Failed"); }
         }
 
-        // Map Link
-        const mapUrl = `/admin/gps?lat=${data.latitude}&lng=${data.longitude}&name=${encodeURIComponent(data.reporter_name || '')}&contact=${encodeURIComponent(data.contact_number || '')}`;
-        document.getElementById('m_map_link').href = mapUrl;
 
         // Image Logic
         const imgContainer = document.getElementById('m_image_container');
@@ -567,7 +666,7 @@
                         // Update actions cell to show resolved text
                         const actionsCell = row.querySelector('.actions');
                         if (actionsCell) {
-                            actionsCell.innerHTML = '<span style="font-size:12px; color:#16a34a; font-weight:600;">Case Resolved by User</span>';
+                            actionsCell.innerHTML = '<span style="font-size:12px; color:#16a34a; font-weight:600;">Case Resolved!</span>';
                         }
                     }
 
@@ -638,7 +737,7 @@
             } else if (status === 'ON_GOING') {
                 actionsHtml += `<span style="font-size:12px; color:#64748b; font-style:italic;">Waiting for user resolution...</span>`;
             } else if (status === 'RESOLVED') {
-                actionsHtml += `<span style="font-size:12px; color:#16a34a; font-weight:600;">Case Resolved by User</span>`;
+                actionsHtml += `<span style="font-size:12px; color:#16a34a; font-weight:600;">Case Resolved!</span>`;
             }
 
         row.innerHTML = `
