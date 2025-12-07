@@ -98,7 +98,7 @@ class ReportedCasesController extends Controller
         // PENDING -> ACKNOWLEDGED -> ON_GOING
         // They cannot set RESOLVED or DECLINED directly.
         $request->validate([
-            'status' => ['required', Rule::in(['ACKNOWLEDGED', 'ON_GOING'])],
+            'status' => ['required', Rule::in(['ACKNOWLEDGED', 'ON_GOING', 'RESOLVED', 'DECLINED'])],
         ]);
 
         // Fetch current report status from Supabase
@@ -114,13 +114,25 @@ class ReportedCasesController extends Controller
         $currentStatus = $report->status ?? 'PENDING';
         $targetStatus = $request->status;
 
+        if (in_array($currentStatus, ['RESOLVED', 'DECLINED'], true)) {
+            return back()->with('error', 'This report is already in a final state and cannot be updated.');
+        }
+
         $isValid = false;
 
-        // Enforce one-way transitions: PENDING -> ACKNOWLEDGED -> ON_GOING
-        if ($currentStatus === 'PENDING' && $targetStatus === 'ACKNOWLEDGED') {
-            $isValid = true;
-        } elseif ($currentStatus === 'ACKNOWLEDGED' && $targetStatus === 'ON_GOING') {
-            $isValid = true;
+        // Enforce one-way transitions with Decline and Resolve options
+        if ($currentStatus === 'PENDING') {
+            if (in_array($targetStatus, ['ACKNOWLEDGED', 'DECLINED'], true)) {
+                $isValid = true;
+            }
+        } elseif ($currentStatus === 'ACKNOWLEDGED') {
+            if (in_array($targetStatus, ['ON_GOING', 'DECLINED'], true)) {
+                $isValid = true;
+            }
+        } elseif ($currentStatus === 'ON_GOING') {
+            if ($targetStatus === 'RESOLVED') {
+                $isValid = true;
+            }
         }
 
         if (!$isValid) {

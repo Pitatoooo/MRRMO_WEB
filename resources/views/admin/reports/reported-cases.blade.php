@@ -150,12 +150,32 @@
 
                             // Determine status color
                             $statusColor = match($case->status ?? 'PENDING') {
-                                'PENDING' => '#d97706',      // Orange
-                                'ACKNOWLEDGED' => '#2563eb', // Blue
-                                'ON_GOING' => '#ca8a04',     // Yellow
-                                'RESOLVED' => '#16a34a',     // Green
-                                'DECLINED' => '#dc2626',     // Red
-                                default => '#64748b',       // Gray
+                                'PENDING' => '#d97706',
+                                'ACKNOWLEDGED' => '#2563eb',
+                                'ON_GOING' => '#ca8a04',
+                                'RESOLVED' => '#16a34a',
+                                'DECLINED' => '#dc2626',
+                                default => '#64748b',
+                            };
+
+                            // Incident Type Colors from Mobile App
+                            $incidentColor = match($case->incident_type) {
+                                'Fire' => '#FF6B35',
+                                'Medical' => '#3B82F6',
+                                'Vehicular Accident' => '#FF4444',
+                                'Flood' => '#4A90E2',
+                                'Earthquake' => '#8B4513',
+                                'Electrical' => '#F59E0B',
+                                default => '#64748b',
+                            };
+
+                            // Patient Status (AVPU) Colors from Mobile App
+                            $avpuColor = match($case->patient_status) {
+                                'Alert' => '#10B981',
+                                'Voice' => '#F59E0B',
+                                'Pain' => '#FF6B35',
+                                'Unresponsive' => '#EF4444',
+                                default => '#334155',
                             };
                         @endphp
 
@@ -163,10 +183,10 @@
 
                         <td>{{ $case->contact_number ?? '—' }}</td>
 
-                        <td><span style="background:#f3f4f6; padding:4px 8px; border-radius:6px; font-size:12px;">{{ $case->incident_type ?? '—' }}</span></td>
+                        <td><span style="background-color:{{ $incidentColor }}; color:white; padding:4px 8px; border-radius:6px; font-size:12px; font-weight:600;">{{ $case->incident_type ?? '—' }}</span></td>
 
                         <td>
-                            <span style="font-weight:600; color:#475569; background:#e2e8f0; padding:4px 8px; border-radius:6px; font-size:12px;">
+                            <span style="background-color:{{ $avpuColor }}; color:white; padding:4px 8px; border-radius:6px; font-size:12px; font-weight:600;">
                                 {{ $case->patient_status ?? 'N/A' }}
                             </span>
                         </td>
@@ -213,6 +233,13 @@
                                     onclick="handleStatusAction('{{ $case->id }}', 'ACKNOWLEDGED')">
                                     Accept Report
                                 </button>
+                                <button type="button"
+                                    class="btn-dispatch" 
+                                    style="background:#dc2626; color:white;" 
+                                    title="Decline Report"
+                                    onclick="handleStatusAction('{{ $case->id }}', 'DECLINED')">
+                                    Decline Report
+                                </button>
                                 
                             @elseif($workflowStatus === 'ACKNOWLEDGED')
                                 <button type="button"
@@ -222,13 +249,28 @@
                                     onclick="handleStatusAction('{{ $case->id }}', 'ON_GOING')">
                                     Dispatch Team
                                 </button>
+                                <button type="button"
+                                    class="btn-dispatch" 
+                                    style="background:#dc2626; color:white;" 
+                                    title="Decline Report"
+                                    onclick="handleStatusAction('{{ $case->id }}', 'DECLINED')">
+                                    Decline Report
+                                </button>
                             @elseif($workflowStatus === 'ON_GOING')
-                                <span style="font-size:12px; color:#64748b; font-style:italic;">
-                                    Waiting for user resolution...
-                                </span>
+                                <button type="button"
+                                    class="btn-dispatch" 
+                                    style="background:#16a34a; color:white;" 
+                                    title="Mark as Resolved"
+                                    onclick="handleStatusAction('{{ $case->id }}', 'RESOLVED')">
+                                    Mark as Resolved
+                                </button>
                             @elseif($workflowStatus === 'RESOLVED')
                                 <span style="font-size:12px; color:#16a34a; font-weight:600;">
                                     Case Resolved!
+                                </span>
+                            @elseif($workflowStatus === 'DECLINED')
+                                <span style="font-size:12px; color:#dc2626; font-weight:600;">
+                                    Report Declined
                                 </span>
                             @endif
                         </td>
@@ -305,6 +347,43 @@
     </div>
 </div>
 
+<div id="statusConfirmModal" class="modal-overlay">
+    <div class="modal-box">
+        <div class="modal-header">
+            <h3>Confirm Action</h3>
+            <button class="modal-close" onclick="closeStatusConfirmModal()">&times;</button>
+        </div>
+        <div class="modal-body">
+            <p id="statusConfirmMessage" style="margin: 0; color: #334155; font-weight: 500;"></p>
+        </div>
+        <div class="modal-actions">
+            <button onclick="closeStatusConfirmModal()" style="padding:10px 18px; border-radius:8px; background:white; color:#0f172a; font-weight:600; border:1px solid #cbd5e1; cursor:pointer;">
+                Cancel
+            </button>
+            <button onclick="performStatusUpdate()" style="padding:10px 18px; border-radius:8px; background:#0b2a55; color:white; font-weight:600; border:none; cursor:pointer;">
+                Yes, Continue
+            </button>
+        </div>
+    </div>
+</div>
+
+<div id="statusErrorModal" class="modal-overlay">
+    <div class="modal-box">
+        <div class="modal-header">
+            <h3>Status Update Failed</h3>
+            <button class="modal-close" onclick="closeStatusErrorModal()">&times;</button>
+        </div>
+        <div class="modal-body">
+            <p id="statusErrorMessage" style="margin: 0; color: #b91c1c; font-weight: 500;"></p>
+        </div>
+        <div class="modal-actions">
+            <button onclick="closeStatusErrorModal()" style="padding:10px 18px; border-radius:8px; background:#dc2626; color:white; font-weight:600; border:none; cursor:pointer;">
+                Close
+            </button>
+        </div>
+    </div>
+</div>
+
 <script>
     let currentReportId = null;
     let modalMediaList = [];
@@ -326,7 +405,7 @@
 
         if (modalMediaList && modalMediaList.length > 0) {
             imagesHtml += '<div class="print-section">';
-            imagesHtml += '<div class="print-label" style="margin-bottom:8px;">Evidence Photos</div>';
+            imagesHtml += '<div class="print-label" style="width:100%; text-align:left; margin-bottom:5px;">Evidence Photos</div>';
             for (let i = 0; i < modalMediaList.length; i++) {
                 const rawUrl = modalMediaList[i];
                 if (!rawUrl) continue;
@@ -435,15 +514,107 @@
     }
 
     // --- 1. STRICT STATUS ACTION HANDLER ---
+    let pendingStatusReportId = null;
+    let pendingStatusNewStatus = null;
+
+    function openStatusConfirmModal(message, reportId, newStatus) {
+        pendingStatusReportId = reportId;
+        pendingStatusNewStatus = newStatus;
+
+        const messageEl = document.getElementById('statusConfirmMessage');
+        if (messageEl) {
+            messageEl.textContent = message;
+        }
+
+        const modal = document.getElementById('statusConfirmModal');
+        if (modal) {
+            const header = modal.querySelector('.modal-header');
+            if (header) {
+                let bgColor = '#0b2a55';
+                if (newStatus === 'ACKNOWLEDGED') {
+                    // Match Accept button (green)
+                    bgColor = '#22c55e';
+                } else if (newStatus === 'ON_GOING') {
+                    // Match Dispatch button (blue)
+                    bgColor = '#2563eb';
+                } else if (newStatus === 'DECLINED') {
+                    // Match Decline button (red)
+                    bgColor = '#dc2626';
+                } else if (newStatus === 'RESOLVED') {
+                    // Match Resolve button (green)
+                    bgColor = '#16a34a';
+                }
+                header.style.background = bgColor;
+            }
+            modal.style.display = 'flex';
+        }
+    }
+
+    function closeStatusConfirmModal() {
+        const modal = document.getElementById('statusConfirmModal');
+        if (modal) {
+            modal.style.display = 'none';
+        }
+    }
+
+    function showStatusError(message) {
+        const messageEl = document.getElementById('statusErrorMessage');
+        if (messageEl) {
+            messageEl.textContent = message;
+        }
+        const modal = document.getElementById('statusErrorModal');
+        if (modal) {
+            const header = modal.querySelector('.modal-header');
+            if (header) {
+                header.style.background = '#dc2626';
+            }
+            modal.style.display = 'flex';
+        }
+    }
+
+    function closeStatusErrorModal() {
+        const modal = document.getElementById('statusErrorModal');
+        if (modal) {
+            modal.style.display = 'none';
+        }
+    }
+
     async function handleStatusAction(reportId, newStatus) {
         const row = document.querySelector(`tr[data-id="${reportId}"]`);
         if (!row) return;
 
-        const confirmMessage = newStatus === 'ACKNOWLEDGED'
-            ? 'Are you sure you want to ACCEPT this report?'
-            : 'Are you sure you want to DISPATCH a team for this report?';
+        let confirmMessage;
+        if (newStatus === 'ACKNOWLEDGED') {
+            confirmMessage = 'Are you sure you want to ACCEPT this report?';
+        } else if (newStatus === 'ON_GOING') {
+            confirmMessage = 'Are you sure you want to DISPATCH a team for this report?';
+        } else if (newStatus === 'DECLINED') {
+            confirmMessage = 'Decline this report? This will mark it as acknowledged and it cannot be changed afterwards.';
+        } else if (newStatus === 'RESOLVED') {
+            confirmMessage = 'Mark this report as RESOLVED? This cannot be changed afterwards.';
+        } else {
+            confirmMessage = 'Apply this status change?';
+        }
 
-        if (!confirm(confirmMessage)) return;
+        openStatusConfirmModal(confirmMessage, reportId, newStatus);
+    }
+
+    async function performStatusUpdate() {
+        const reportId = pendingStatusReportId;
+        const newStatus = pendingStatusNewStatus;
+
+        if (!reportId || !newStatus) {
+            closeStatusConfirmModal();
+            return;
+        }
+
+        const row = document.querySelector(`tr[data-id="${reportId}"]`);
+        if (!row) {
+            closeStatusConfirmModal();
+            return;
+        }
+
+        closeStatusConfirmModal();
 
         try {
             const response = await fetch(`/admin/reports/${reportId}/status`, {
@@ -458,7 +629,7 @@
             if (!response.ok) {
                 const text = await response.text();
                 console.error('Status update failed:', text);
-                alert('Failed to update status. Please refresh and try again.');
+                showStatusError('Failed to update status. Please refresh and try again.');
                 return;
             }
 
@@ -485,7 +656,7 @@
             window.location.reload();
         } catch (error) {
             console.error('Error updating report status:', error);
-            alert('An unexpected error occurred while updating status.');
+            showStatusError('An unexpected error occurred while updating status.');
         }
     }
 
@@ -533,9 +704,36 @@
 
         document.getElementById('m_reporter').innerText = data.reporter_name || 'Guest';
         document.getElementById('m_contact_number').innerText = data.contact_number || 'N/A';
-        document.getElementById('m_type').innerText = data.incident_type || 'N/A';
+
+        // Incident Type with color
+        const incidentTypeEl = document.getElementById('m_type');
+        const incidentType = data.incident_type || 'N/A';
+        const incidentColor = {
+            'Fire': '#FF6B35',
+            'Medical': '#3B82F6',
+            'Vehicular Accident': '#FF4444',
+            'Flood': '#4A90E2',
+            'Earthquake': '#8B4513',
+            'Electrical': '#F59E0B'
+        }[incidentType] || '#64748b';
+        incidentTypeEl.innerHTML = `<span style="background-color:${incidentColor}; color:white; padding:3px 7px; border-radius:6px; font-size:13px; font-weight:600;">${incidentType}</span>`;
+
+        // AVPU Status with color
+        const patientStatusEl = document.getElementById('m_patient_status');
+        const patientStatus = data.patient_status || 'N/A';
+        const avpuColor = {
+            'Alert': '#10B981',
+            'Voice': '#F59E0B',
+            'Pain': '#FF6B35',
+            'Unresponsive': '#EF4444'
+        }[patientStatus] || '#64748b';
+        patientStatusEl.innerHTML = `<span style="background-color:${avpuColor}; color:white; padding:3px 7px; border-radius:6px; font-size:13px; font-weight:600;">${patientStatus}</span>`;
+
         document.getElementById('m_status').innerText = data.status || 'Pending';
-        document.getElementById('m_patient_status').innerText = data.patient_status || 'Pending';
+        const rawStatus = data.status || 'PENDING';
+        const displayStatus = rawStatus === 'DECLINED' ? 'RECORDED' : rawStatus;
+        document.getElementById('m_status').innerText = displayStatus;
+
         document.getElementById('m_description').innerText = data.description || 'No description.';
 
         const dateObj = new Date(data.incident_datetime || data.created_at);
@@ -750,6 +948,10 @@
                     row.querySelector("td:nth-child(1)").innerText = report.reporter_name;
                     row.querySelector("td:nth-child(2)").innerText = report.contact_number;
 
+                    const displayStatusText = report.status === 'DECLINED'
+                        ? 'RECORDED'
+                        : (report.status || 'PENDING').replace('_', ' ');
+
                     // Update DETAILS button with correct report object
                     const reportJson = encodeURIComponent(JSON.stringify(report));
                     const detailsBtn = row.querySelector(".btn-details");
@@ -822,6 +1024,10 @@
                         msgEl.textContent = `Report #${report.id} has been marked as RESOLVED by the citizen.`;
                     }
                     if (modal) {
+                        const header = modal.querySelector('.modal-header');
+                        if (header) {
+                            header.style.background = '#16a34a';
+                        }
                         modal.style.display = 'flex';
                     }
                 }
@@ -845,24 +1051,31 @@
 
             let statusColor;
             switch (status) {
-                case 'PENDING':
-                    statusColor = '#d97706';
-                    break;
-                case 'ACKNOWLEDGED':
-                    statusColor = '#2563eb';
-                    break;
-                case 'ON_GOING':
-                    statusColor = '#ca8a04';
-                    break;
-                case 'RESOLVED':
-                    statusColor = '#16a34a';
-                    break;
-                case 'DECLINED':
-                    statusColor = '#dc2626';
-                    break;
-                default:
-                    statusColor = '#64748b';
+                case 'PENDING': statusColor = '#d97706'; break;
+                case 'ACKNOWLEDGED': statusColor = '#2563eb'; break;
+                case 'ON_GOING': statusColor = '#ca8a04'; break;
+                case 'RESOLVED': statusColor = '#16a34a'; break;
+                case 'DECLINED': statusColor = '#dc2626'; break;
+                default: statusColor = '#64748b';
             }
+
+            const incidentType = report.incident_type || 'N/A';
+            const incidentColor = {
+                'Fire': '#FF6B35',
+                'Medical': '#3B82F6',
+                'Vehicular Accident': '#FF4444',
+                'Flood': '#4A90E2',
+                'Earthquake': '#8B4513',
+                'Electrical': '#F59E0B'
+            }[incidentType] || '#64748b';
+
+            const patientStatus = report.patient_status || 'N/A';
+            const avpuColor = {
+                'Alert': '#10B981',
+                'Voice': '#F59E0B',
+                'Pain': '#FF6B35',
+                'Unresponsive': '#EF4444'
+            }[patientStatus] || '#334155';
 
             const reportJson = encodeURIComponent(JSON.stringify(report));
 
@@ -873,22 +1086,26 @@
 
             if (status === 'PENDING') {
                 actionsHtml += `<button type="button" class="btn-accept" style="background:#22c55e; color:white;" title="Accept Report" onclick="handleStatusAction('${report.id}', 'ACKNOWLEDGED')">Accept Report</button>`;
+                actionsHtml += `<button type="button" class="btn-dispatch" style="background:#dc2626; color:white;" title="Decline Report" onclick="handleStatusAction('${report.id}', 'DECLINED')">Decline Report</button>`;
             } else if (status === 'ACKNOWLEDGED') {
                 actionsHtml += `<button type="button" class="btn-dispatch" style="background:#2563eb; color:white;" title="Dispatch Team" onclick="handleStatusAction('${report.id}', 'ON_GOING')">Dispatch Team</button>`;
+                actionsHtml += `<button type="button" class="btn-dispatch" style="background:#dc2626; color:white;" title="Decline Report" onclick="handleStatusAction('${report.id}', 'DECLINED')">Decline Report</button>`;
             } else if (status === 'ON_GOING') {
-                actionsHtml += `<span style="font-size:12px; color:#64748b; font-style:italic;">Waiting for user resolution...</span>`;
+                actionsHtml += `<button type="button" class="btn-dispatch" style="background:#16a34a; color:white;" title="Mark as Resolved" onclick="handleStatusAction('${report.id}', 'RESOLVED')">Mark as Resolved</button>`;
             } else if (status === 'RESOLVED') {
                 actionsHtml += `<span style="font-size:12px; color:#16a34a; font-weight:600;">Case Resolved!</span>`;
+            } else if (status === 'DECLINED') {
+                actionsHtml += `<span style="font-size:12px; color:#0ea5e9; font-weight:600;">Report Recorded</span>`;
             }
 
-        row.innerHTML = `
+            row.innerHTML = `
     <td style="font-weight:bold; color:#0b2a55;">${report.reporter_name || "Loading..."}</td>
     <td>${report.contact_number || "Loading..."}</td>
-    <td><span style="background:#f3f4f6; padding:4px 8px; border-radius:6px; font-size:12px;">${report.incident_type || "—"}</span></td>
+    <td><span style="background-color:${incidentColor}; color:white; padding:4px 8px; border-radius:6px; font-size:12px; font-weight:600;">${incidentType}</span></td>
     
     <td>
-        <span style="font-weight:600; color:#475569; background:#e2e8f0; padding:4px 8px; border-radius:6px; font-size:12px;">
-            ${report.patient_status || "N/A"}
+        <span style="background-color:${avpuColor}; color:white; padding:4px 8px; border-radius:6px; font-size:12px; font-weight:600;">
+            ${patientStatus}
         </span>
     </td>
 
@@ -897,9 +1114,9 @@
     <td>
         <form action="/admin/reports/${report.id}/status" method="POST" class="status-form">
             <input type="hidden" name="_token" value="${document.querySelector('meta[name="csrf-token"]').getAttribute('content')}"> 
-            <input type="hidden" name="status" value="${report.status || 'PENDING'}">
+            <input type="hidden" name="status" value="${status}">
             <span class="status-badge" style="background-color: ${statusColor}; color: white; border-radius: 6px; font-size: 12px; padding: 4px 8px; display: inline-block;">
-                ${(report.status || 'PENDING').replace('_', ' ')}
+                ${status === 'DECLINED' ? 'RECORDED' : (status || 'PENDING').replace('_', ' ')}
             </span>
         </form>
     </td>
