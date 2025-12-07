@@ -64,6 +64,13 @@
   .detail-value { font-weight: 600; color: #334155; font-size: 14px; flex: 1; }
   .modal-image-container { text-align: center; margin-top: 15px; border-top: 1px solid #f1f5f9; padding-top: 15px; }
   .modal-image { max-width: 100%; border-radius: 8px; border: 1px solid #e2e8f0; margin-top: 10px; cursor: pointer; }
+  .image-gallery { display:flex; align-items:center; justify-content:center; gap:8px; margin-top:8px; }
+  .gallery-main { flex:1; }
+  .gallery-nav { background:#e2e8f0; border:none; border-radius:999px; width:28px; height:28px; display:flex; align-items:center; justify-content:center; cursor:pointer; font-weight:700; color:#334155; }
+  .gallery-nav:disabled { opacity:0.4; cursor:default; }
+  .thumbnail-row { display:flex; flex-wrap:wrap; justify-content:center; gap:6px; margin-top:10px; }
+  .thumbnail-image { width:48px; height:48px; object-fit:cover; border-radius:6px; border:2px solid transparent; cursor:pointer; }
+  .thumbnail-image.active { border-color:#0b2a55; }
   .modal-actions {
       background: #f8fafc; padding: 15px 25px; border-top: 1px solid #e2e8f0;
       display: flex; justify-content: flex-end; gap: 10px;
@@ -256,9 +263,16 @@
 
             <div id="m_image_container" class="modal-image-container" style="display:none;">
                 <div class="detail-label" style="width:100%; text-align:left; margin-bottom:5px;">Evidence Photo</div>
-                <a id="m_image_link" href="#" target="_blank">
-                    <img id="m_image" class="modal-image" src="" alt="Evidence Photo">
-                </a>
+                <div id="m_image_gallery" class="image-gallery">
+                    <button type="button" id="m_image_prev" class="gallery-nav" onclick="showPrevImage()">&#10094;</button>
+                    <div class="gallery-main">
+                        <a id="m_image_link" href="#" target="_blank">
+                            <img id="m_image" class="modal-image" src="" alt="Evidence Photo">
+                        </a>
+                    </div>
+                    <button type="button" id="m_image_next" class="gallery-nav" onclick="showNextImage()">&#10095;</button>
+                </div>
+                <div id="m_thumbnails" class="thumbnail-row"></div>
             </div>
         </div>
         <div class="modal-actions">
@@ -293,6 +307,8 @@
 
 <script>
     let currentReportId = null;
+    let modalMediaList = [];
+    let modalMediaIndex = 0;
 
     // --- 0. PRINT FUNCTION (ADDED) ---
     function printReportDetails() {
@@ -306,6 +322,41 @@
         const timeReported = document.getElementById('m_time').innerText;
         const imageElement = document.getElementById('m_image');
 
+        let imagesHtml = '';
+
+        if (modalMediaList && modalMediaList.length > 0) {
+            imagesHtml += '<div class="print-section">';
+            imagesHtml += '<div class="print-label" style="margin-bottom:8px;">Evidence Photos</div>';
+            for (let i = 0; i < modalMediaList.length; i++) {
+                const rawUrl = modalMediaList[i];
+                if (!rawUrl) continue;
+                const mediaUrl = String(rawUrl).replace(/^{|}$/g, '').replace(/"/g, '').trim();
+                if (!mediaUrl) continue;
+
+                const isFirst = i === 0;
+                const isLast = i === modalMediaList.length - 1;
+                let wrapperStyle = 'text-align:center; margin-top:' + (isFirst ? '100px' : '100px') + '; page-break-inside: avoid;';
+                if (!isLast) {
+                    wrapperStyle += ' page-break-after: always; break-after: page;';
+                }
+
+                const imgStyleAttr = isFirst ? ' style="max-height:260px;"' : '';
+
+                imagesHtml += '<div class="print-image-wrapper" style="' + wrapperStyle + '">';
+                imagesHtml += '<div class="print-image-label" style="font-weight:600; margin-bottom:6px; color:#0b2a55;">Photo ' + (i + 1) + '</div>';
+                imagesHtml += '<img src="' + mediaUrl + '" class="print-image" alt="Evidence Photo ' + (i + 1) + '"' + imgStyleAttr + ' />';
+                imagesHtml += '</div>';
+            }
+            imagesHtml += '</div>';
+        } else if (imageElement && imageElement.src) {
+            imagesHtml += '<div class="print-section">';
+            imagesHtml += '<div class="print-image-wrapper" style="text-align:center; margin-top:15px;">';
+            imagesHtml += '<div class="print-image-label" style="font-weight:600; margin-bottom:8px; color: blue;">Evidence Photo</div>';
+            imagesHtml += '<img src="' + imageElement.src + '" class="print-image" alt="Evidence Photo" style="display:inline-block;" />';
+            imagesHtml += '</div>';
+            imagesHtml += '</div>';
+        }
+
         let printWindow = window.open('', '', 'height=600,width=800');
         printWindow.document.write(`
             <html>
@@ -318,7 +369,7 @@
                     .print-section { margin-bottom: 15px; }
                     .print-label { font-weight: bold; color: #0b2a55; }
                     .print-value { color: #334155; margin-top: 5px; }
-                    .print-image { max-width: 400px; margin-top: 20px; border: 1px solid #ddd; }
+                    .print-image { max-width: 400px; margin-top: 10px; border: 1px solid #ddd; }
                 </style>
             </head>
             <body>
@@ -330,10 +381,10 @@
                     <tr>
                         <th style="color: blue;">Reporter: </th>
                         <td style="text-decoration: underline;"> ${reporterName}</td>
-        
+
                         <th style="color: blue;">Contact No.: </th>
                         <td style="text-decoration: underline;"> ${contactNumber}</td>
-        
+
                         <th style="color: blue;">Incident Type: </th>
                         <td style="text-decoration: underline;"> ${incidentType}</td>
                     </tr>
@@ -372,12 +423,7 @@
                     </tr>
                 </table>
                 </div>
-                ${imageElement && imageElement.src ? `
-                        <div style="text-align:center; margin-top:15px;">
-                            <div style="font-weight:600; margin-bottom:8px; color: blue;">Evidence Photo</div>
-                            <img src="${imageElement.src}" class="print-image" alt="Evidence Photo" style="display:inline-block;">
-                        </div>
-                    ` : ''}
+                ${imagesHtml}
                 <script>
                     window.print();
                     window.close();
@@ -511,33 +557,128 @@
 
 
         // Image Logic
+        modalMediaList = [];
+        if (data.uploaded_media) {
+            modalMediaList = parseMediaValue(data.uploaded_media);
+        }
+        if ((!modalMediaList || modalMediaList.length === 0) && firstImage) {
+            modalMediaList = parseMediaValue(firstImage);
+        }
+        modalMediaIndex = 0;
+        updateModalImage();
+
+        document.getElementById('caseModal').style.display = 'flex';
+    }
+
+    function parseMediaValue(value) {
+        if (!value) return [];
+        if (Array.isArray(value)) {
+            return value.filter(function (item) { return !!item; });
+        }
+        let str = String(value).trim();
+        if (!str) return [];
+        try {
+            const parsed = JSON.parse(str);
+            if (Array.isArray(parsed)) {
+                return parsed.filter(function (item) { return !!item; });
+            }
+            if (typeof parsed === 'string') {
+                str = parsed.trim();
+            }
+        } catch (e) {}
+        str = str.replace(/^[{\[]/, '').replace(/[}\]]$/, '');
+        str = str.replace(/"/g, '');
+        const parts = str.split(',').map(function (item) {
+            return item.trim();
+        }).filter(function (item) {
+            return item.length > 0;
+        });
+        return parts;
+    }
+
+    function updateModalImage() {
         const imgContainer = document.getElementById('m_image_container');
         const img = document.getElementById('m_image');
         const link = document.getElementById('m_image_link');
+        const thumbs = document.getElementById('m_thumbnails');
+        const prevBtn = document.getElementById('m_image_prev');
+        const nextBtn = document.getElementById('m_image_next');
 
-        // Handle image passed from blade or extracted from JSON
-        let mediaUrl = firstImage; 
-
-        // If passed as empty string, try parsing from JSON
-        if (!mediaUrl && data.uploaded_media) {
-             let mediaArray = data.uploaded_media;
-             if (typeof mediaArray === 'string') {
-                 try { mediaArray = JSON.parse(mediaArray); } catch(e){}
-             }
-             if (Array.isArray(mediaArray) && mediaArray.length > 0) mediaUrl = mediaArray[0];
-             else if (typeof mediaArray === 'string') mediaUrl = mediaArray;
+        if (!imgContainer || !img || !link) {
+            return;
         }
 
-        if (mediaUrl) {
-            mediaUrl = mediaUrl.replace(/^{|}$/g, '').replace(/"/g, '').trim();
-            img.src = mediaUrl;
-            link.href = mediaUrl;
-            imgContainer.style.display = 'block';
-        } else {
+        if (!modalMediaList || modalMediaList.length === 0) {
             imgContainer.style.display = 'none';
+            img.src = '';
+            link.href = '#';
+            if (thumbs) {
+                thumbs.innerHTML = '';
+            }
+            if (prevBtn) prevBtn.disabled = true;
+            if (nextBtn) nextBtn.disabled = true;
+            return;
         }
 
-        document.getElementById('caseModal').style.display = 'flex';
+        if (modalMediaIndex < 0) {
+            modalMediaIndex = 0;
+        }
+        if (modalMediaIndex >= modalMediaList.length) {
+            modalMediaIndex = modalMediaList.length - 1;
+        }
+
+        const rawUrl = modalMediaList[modalMediaIndex];
+        if (!rawUrl) {
+            imgContainer.style.display = 'none';
+            return;
+        }
+        const mediaUrl = String(rawUrl).replace(/^{|}$/g, '').replace(/"/g, '').trim();
+
+        img.src = mediaUrl;
+        link.href = mediaUrl;
+        imgContainer.style.display = 'block';
+
+        if (thumbs) {
+            thumbs.innerHTML = '';
+            if (modalMediaList.length > 1) {
+                for (let i = 0; i < modalMediaList.length; i++) {
+                    const thumbRaw = modalMediaList[i];
+                    const thumbUrl = String(thumbRaw).replace(/^{|}$/g, '').replace(/"/g, '').trim();
+                    if (!thumbUrl) {
+                        continue;
+                    }
+                    const thumb = document.createElement('img');
+                    thumb.src = thumbUrl;
+                    thumb.className = 'thumbnail-image' + (i === modalMediaIndex ? ' active' : '');
+                    (function (index) {
+                        thumb.addEventListener('click', function () {
+                            modalMediaIndex = index;
+                            updateModalImage();
+                        });
+                    })(i);
+                    thumbs.appendChild(thumb);
+                }
+            }
+        }
+
+        if (prevBtn) {
+            prevBtn.disabled = modalMediaList.length <= 1;
+        }
+        if (nextBtn) {
+            nextBtn.disabled = modalMediaList.length <= 1;
+        }
+    }
+
+    function showPrevImage() {
+        if (!modalMediaList || modalMediaList.length === 0) return;
+        modalMediaIndex = (modalMediaIndex - 1 + modalMediaList.length) % modalMediaList.length;
+        updateModalImage();
+    }
+
+    function showNextImage() {
+        if (!modalMediaList || modalMediaList.length === 0) return;
+        modalMediaIndex = (modalMediaIndex + 1) % modalMediaList.length;
+        updateModalImage();
     }
 
     function closeModal() {
